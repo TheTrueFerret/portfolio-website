@@ -3,6 +3,12 @@ const platform = "github";
 const username = "trueferret";
 ---
 
-<footer>
-  <p>Learn more about my projects on <a href={`https://www.${platform}.com/${username}`}>{platform}</a>!</p>
+<footer class='w-full py-6'>
+  <div class='max-w-6xl mx-auto px-4'>
+    <div class='group relative border-2 border-zinc-700 hover:border-zinc-400 transition-all'>
+      <span class='absolute -top-4 left-6 px-2 bg-neutral-900 text-zinc-500 text-md font-semibold group-hover:text-zinc-300 transition-colors'>footer</span>
+      
+      <p>Learn more about my projects on <a href={`https://www.${platform}.com/${username}`}>{platform}</a>!</p>
+    </div>
+  </div>
 </footer>
