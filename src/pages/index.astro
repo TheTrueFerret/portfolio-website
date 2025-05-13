@@ -1,11 +1,20 @@
 ---
 import HeroSection from '../components/HeroSection.astro';
 import Layout from '../layouts/Layout.astro';
+import ExperienceSection from '../components/ExperienceSection.svelte';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import WhoAmISection from '../components/WhoAmISection.astro';
 
 const pageTitle = 'TrueFerret.dev';
+
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 ---
 
 
 <Layout pageTitle={pageTitle}>
   <HeroSection />
+  <WhoAmISection />
+  <ExperienceSection client:load />
 </Layout>
