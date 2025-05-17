@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { workExperienceNl, educationExperienceNl } from "../data/experienceData";
+  import { workExperience, educationExperience } from "../data/experienceData";
   let activeTab: "work" | "education" = "education";
 </script>
 
@@ -33,23 +33,23 @@
     >
       {#if activeTab === "work"}
         <!-- Work Timeline -->
-        {#each workExperienceNl as item}
+        {#each workExperience as item}
           <div class="border-l-2 border-zinc-600 pl-4">
             <div class="my-4">
               <h3 class="text-lg font-bold text-white">{item.title}</h3>
-              <p class="text-sm text-zinc-400">{item.date}</p>
-              <p class="text-zinc-300">{item.description}</p>
+              <p class="text-sm text-zinc-400">{item.description}</p>
+              <p class="text-zinc-300">{item.date}</p>
             </div>
           </div>
         {/each}
       {:else}
         <!-- Education Timeline -->
-        {#each educationExperienceNl as item}
+        {#each educationExperience as item}
           <div class="border-l-2 border-zinc-600 pl-4">
             <div class="my-4">
               <h3 class="text-lg font-bold text-white">{item.title}</h3>
-              <p class="text-sm text-zinc-400">{item.date}</p>
-              <p class="text-zinc-300">{item.description}</p>
+              <p class="text-sm text-zinc-400">{item.description}</p>
+              <p class="text-zinc-300">{item.date}</p>
             </div>
           </div>
         {/each}
