@@ -1,23 +1,25 @@
 ---
-
+import AsciiArtGlow from '../components/AsciiArtGlow.svelte';
 ---
 
 
-<section class="w-full pb-8">
-  <div class="max-w-7xl mx-auto relative">
+<section class="w-full">
+  <div class="max-w-7xl mx-auto relative py-16">
     <!-- Hero Text -->
-    <div class="absolute inset-0 flex flex-col items-center justify-center z-10 px-4 sm:px-6 md:px-8">
-      <h1 class="text-6xl sm:text-7xl md:text-9xl font-bold text-zinc-100 text-center">
+    <div class="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
+      <h1 class="text-6xl sm:text-7xl md:text-9xl font-bold text-zinc-100 text-center z-20">
         Jarno Fret
       </h1>
-      <h4 class="pb-8 text-xl sm:text-2xl font-bold text-zinc-500 text-center">
+      <h4 class="pb-8 text-md sm:text-2xl font-bold text-zinc-500 text-center z-20">
         Creative, Software Engineer, Content Creator
       </h4>
     </div>
 
     <!-- ASCII Art -->
-    <div class="flex justify-center font-mono text-zinc-800 leading-none tracking-tighter select-none overflow-hidden">
-<pre class="text-3xl sm:text-4xl md:text-5xl whitespace-pre">
+    <AsciiArtGlow client:load />
+{/* THE OLD ASCII ART (Could be usefull)
+    <div class="flex justify-center font-mono text-zinc-800 leading-none tracking-tighter select-none overflow-hidden"></div>
+<pre class="text-2xl sm:text-4xl md:text-5xl whitespace-pre"> 
          __________  __  ________       
         /_  __/ __ \/ / / / ____/       
          / / / /_/ / / / / __/          
@@ -32,5 +34,6 @@
                                         
 </pre>
     </div>
+*/}
   </div>
 </section>

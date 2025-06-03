@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+---
+
+<Layout title={project.data.title}>
+  <article class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-zinc-100 mb-4">
+      {project.data.title}
+    </h1>
+    <p class="text-zinc-400 mb-6">
+      Published on: {new Date(project.data.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}
+    </p>
+
+    {project.data.imageUrl && (
+      <img
+        src={project.data.imageUrl}
+        alt={`Image for ${project.data.title}`}
+        class="w-full h-96 object-cover rounded-lg mb-8"
+      />
+    )}
+
+    <div class="prose prose-invert max-w-none text-zinc-300">
+    </div>
+
+    {project.data.projectUrl && (
+      <div class="mt-8 text-center">
+        <a
+          href={project.data.projectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+        >
+          View Live Project
+        </a>
+      </div>
+    )}
+
+    <div class="mt-12 text-center">
+      <a
+        href="/projects"
+        class="text-sky-400 hover:text-sky-300 font-medium underline"
+      >
+        &larr; Back to all projects
+      </a>
+    </div>
+  </article>
+</Layout>

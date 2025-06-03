@@ -34,7 +34,7 @@ const projectsToShow = sortedFeaturedProjects.slice(0, 3); // Show top 3 feature
           {projectsToShow.map((project) => (
             <li class="bg-neutral-950 border-2 border-zinc-700 hover:border-zinc-400 hover:shadow-xl flex flex-col">
               <a
-                href={`/projects/${project.slug}`}
+                href={`/projects/${project.id}`}
                 class="block p-6 flex-grow"
               >
                 {project.data.imageUrl && (
