@@ -3,6 +3,7 @@ import HeroSection from '../components/HeroSection.astro';
 import Layout from '../layouts/Layout.astro';
 import ExperienceSection from '../components/ExperienceSection.svelte';
 import WhoAmISection from '../components/WhoAmISection.astro';
+import FeaturedProjectList from '../components/FeaturedProjectList.astro';
 
 const pageTitle = 'TrueFerret.dev';
 ---
@@ -12,4 +13,5 @@ const pageTitle = 'TrueFerret.dev';
   <HeroSection />
   <WhoAmISection />
   <ExperienceSection client:load />
+  <!-- <FeaturedProjectList /> -->
 </Layout>

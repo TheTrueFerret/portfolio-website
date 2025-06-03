@@ -1,0 +1,70 @@
+---
+// src/pages/projects/[slug].astro
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/Layout.astro'; // Create or use your existing layout
+
+// This function is required for Astro to know which pages to build
+export async function getStaticPaths() {
+  const projectEntries = await getCollection('projects', ({data}) => data.published);
+  return projectEntries.map((entry) => ({
+    params: { slug: entry.slug }, // The slug is derived from the filename
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render(); // Renders the Markdown content
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <article class="prose prose-invert max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <header class="mb-8 text-center">
+      {entry.data.imageUrl && (
+        <img
+          src={entry.data.imageUrl}
+          alt={`Cover for ${entry.data.title}`}
+          class="w-full max-h-96 object-cover rounded-lg shadow-lg mb-8"
+        />
+      )}
+      <h1 class="text-4xl font-bold text-zinc-100 sm:text-5xl">
+        {entry.data.title}
+      </h1>
+      <p class="mt-2 text-lg text-zinc-400">
+        Published on {new Date(entry.data.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </p>
+      {
+        entry.data.tags && entry.data.tags.length > 0 && (
+          <div class="mt-4 flex flex-wrap justify-center gap-2">
+            {entry.data.tags.map((tag) => (
+              <span class="text-sm bg-sky-700/50 text-sky-300 px-3 py-1 rounded-full">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <div class="text-zinc-300">
+      <Content /> {/* This is where your Markdown content goes */}
+    </div>
+
+    {entry.data.projectUrl && (
+        <div class="mt-12 text-center">
+            <a href={entry.data.projectUrl} target="_blank" rel="noopener noreferrer" class="inline-block bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                View Project / Repository
+            </a>
+        </div>
+    )}
+
+    <div class="mt-12 text-center">
+      <a href="/#projects" class="text-sky-400 hover:text-sky-300 font-medium">
+        &larr; Back to all projects
+      </a>
+    </div>
+  </article>
+</BaseLayout>
