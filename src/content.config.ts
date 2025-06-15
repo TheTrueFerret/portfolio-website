@@ -2,6 +2,32 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 
+const workExperienceCollection = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/data/work-experience" }),
+  schema: z.object({
+    company: z.string(),
+    image: z.string().optional(),
+    title: z.string(),
+    date: z.string(),
+    description: z.string().optional(),
+    order: z.number().optional(),
+  }),
+});
+
+
+const educationExperienceCollection = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/data/education-experience" }),
+  schema: z.object({
+    company: z.string(),
+    image: z.string().optional(),
+    title: z.string(),
+    date: z.string(),
+    description: z.string().optional(),
+    order: z.number().optional(),
+  }),
+});
+
+
 const blogCollection = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./src/data/posts" }),
   schema: z.object({
@@ -31,6 +57,8 @@ const projectCollection = defineCollection({
 
 
 export const collections = {
+  work: workExperienceCollection,
+  education: educationExperienceCollection,
   blog: blogCollection,
   projects: projectCollection,
 };

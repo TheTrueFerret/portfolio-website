@@ -1,0 +1,100 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from "astro:assets";
+import ExperienceItem from './ExperienceItem.astro';
+
+const workExperienceEntries = await getCollection('work');
+const educationExperienceEntries = await getCollection('education');
+
+const workExperience = workExperienceEntries
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
+  .map(entry => entry.data);
+
+const educationExperience = educationExperienceEntries
+  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
+  .map(entry => entry.data);
+
+const images = import.meta.glob('/src/assets/images/**/*');
+const getImageSrc = async (imagePath: string) => {
+  if (!imagePath) return null;
+  const fullPath = `/src${imagePath}`;
+  if (fullPath in images) {
+    const imageModule = await images[fullPath]();
+    return (imageModule as any).default;
+  }
+  return null;
+};
+---
+
+<section class="w-full py-10">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="flex justify-center gap-4 mb-4">
+      <button
+        id="work-tab"
+        class="tab-button w-full px-6 py-2 border-2 font-semibold border-zinc-300 bg-zinc-300 text-zinc-900"
+      >
+        Work Experience
+      </button>
+      <button
+        id="education-tab"
+        class="tab-button w-full px-6 py-2 border-2 font-semibold border-zinc-700 bg-zinc-950 text-white hover:border-zinc-300 hover:text-zinc-300"
+      >
+        Education
+      </button>
+    </div>
+    
+    <div class="md:pl-24 flex flex-col justify-center p-4 border-2 border-zinc-700 hover:border-zinc-400">
+      <!-- Work Timeline -->
+      <div id="work-content" class="tab-content">
+        {workExperience.map(async (item) => {
+          const imageSrc = item.image ? await getImageSrc(item.image) : null;
+          return (
+            <ExperienceItem item={item} imageSrc={imageSrc} />
+          );
+        })}
+      </div>
+
+      <!-- Education Timeline -->
+      <div id="education-content" class="tab-content" style="display: none;">
+        {educationExperience.map(async (item) => {
+          const imageSrc = item.image ? await getImageSrc(item.image) : null;
+          return (
+            <ExperienceItem item={item} imageSrc={imageSrc} />
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const workTab = document.getElementById('work-tab');
+  const educationTab = document.getElementById('education-tab');
+  const workContent = document.getElementById('work-content');
+  const educationContent = document.getElementById('education-content');
+
+  function showWork() {
+    workTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:text-zinc-300');
+    workTab?.classList.add('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
+    
+    educationTab?.classList.remove('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
+    educationTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:border-zinc-300', 'hover:text-zinc-300');
+
+    workContent?.style.setProperty('display', 'block');
+    educationContent?.style.setProperty('display', 'none');
+  }
+
+  function showEducation() {
+    educationTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:text-zinc-300');
+    educationTab?.classList.add('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
+    
+    workTab?.classList.remove('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
+    workTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:border-zinc-300', 'hover:text-zinc-300');
+
+    educationContent?.style.setProperty('display', 'block');
+    workContent?.style.setProperty('display', 'none');
+  }
+
+  workTab?.addEventListener('click', showWork);
+  educationTab?.addEventListener('click', showEducation);
+</script>

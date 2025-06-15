@@ -1,9 +1,9 @@
 ---
 import HeroSection from '../components/HeroSection.astro';
 import Layout from '../layouts/Layout.astro';
-import ExperienceSection from '../components/ExperienceSection.svelte';
 import WhoAmISection from '../components/WhoAmISection.astro';
 import FeaturedProjectList from '../components/FeaturedProjectList.astro';
+import ExperienceSection from '../components/ExperienceSection.astro';
 
 const pageTitle = 'TrueFerret.dev';
 ---
@@ -12,7 +12,7 @@ const pageTitle = 'TrueFerret.dev';
 <Layout pageTitle={pageTitle}>
   <HeroSection />
   <WhoAmISection />
-  <ExperienceSection client:load />
+  <ExperienceSection />
   {/* <FeaturedProjectList />*/}
   
 </Layout>
