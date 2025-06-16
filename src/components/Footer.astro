@@ -1,4 +1,6 @@
 ---
+import { Icon } from 'astro-icon/components'
+
 const currentYear = new Date().getFullYear();
 
 const navLinks = [
@@ -13,163 +15,6 @@ const otherWebsites = [
     href: "",
     text: "Soon...",
     target: "",
-  },
-];
-
-const instagramSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<circle cx="17" cy="7" r="1.5" fill="currentColor" fill-opacity="0">
-		<animate fill="freeze" attributeName="fill-opacity" begin="1.3s" dur="0.15s" values="0;1" />
-	</circle>
-	<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-		<path stroke-dasharray="72" stroke-dashoffset="72" d="M16 3c2.76 0 5 2.24 5 5v8c0 2.76 -2.24 5 -5 5h-8c-2.76 0 -5 -2.24 -5 -5v-8c0 -2.76 2.24 -5 5 -5h4Z">
-			<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;0" />
-		</path>
-		<path stroke-dasharray="28" stroke-dashoffset="28" d="M12 8c2.21 0 4 1.79 4 4c0 2.21 -1.79 4 -4 4c-2.21 0 -4 -1.79 -4 -4c0 -2.21 1.79 -4 4 -4">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.6s" values="28;0" />
-		</path>
-	</g>
-</svg>`;
-
-const githubSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<mask id="lineMdGithubLoop0" width="24" height="24" x="0" y="0">
-		<g fill="#fff">
-			<ellipse cx="9.5" cy="9" rx="1.5" ry="1" />
-			<ellipse cx="14.5" cy="9" rx="1.5" ry="1" />
-		</g>
-	</mask>
-	<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-		<path stroke-dasharray="32" stroke-dashoffset="32" d="M12 4c1.67 0 2.61 0.4 3 0.5c0.53 -0.43 1.94 -1.5 3.5 -1.5c0.34 1 0.29 2.22 0 3c0.75 1 1 2 1 3.5c0 2.19 -0.48 3.58 -1.5 4.5c-1.02 0.92 -2.11 1.37 -3.5 1.5c0.65 0.54 0.5 1.87 0.5 2.5c0 0.73 0 3 0 3M12 4c-1.67 0 -2.61 0.4 -3 0.5c-0.53 -0.43 -1.94 -1.5 -3.5 -1.5c-0.34 1 -0.29 2.22 0 3c-0.75 1 -1 2 -1 3.5c0 2.19 0.48 3.58 1.5 4.5c1.02 0.92 2.11 1.37 3.5 1.5c-0.65 0.54 -0.5 1.87 -0.5 2.5c0 0.73 0 3 0 3">
-			<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.7s" values="32;0" />
-		</path>
-		<path stroke-dasharray="10" stroke-dashoffset="10" d="M9 19c-1.406 0-2.844-.563-3.688-1.188C4.47 17.188 4.22 16.157 3 15.5">
-			<animate attributeName="d" dur="3s" repeatCount="indefinite" values="M9 19c-1.406 0-2.844-.563-3.688-1.188C4.47 17.188 4.22 16.157 3 15.5;M9 19c-1.406 0-3-.5-4-.5-.532 0-1 0-2-.5;M9 19c-1.406 0-2.844-.563-3.688-1.188C4.47 17.188 4.22 16.157 3 15.5" />
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="10;0" />
-		</path>
-	</g>
-	<rect width="8" height="4" x="8" y="11" fill="currentColor" mask="url(#lineMdGithubLoop0)">
-		<animate attributeName="y" dur="10s" keyTimes="0;0.45;0.46;0.54;0.55;1" repeatCount="indefinite" values="11;11;7;7;11;11" />
-	</rect>
-</svg>`;
-
-const twitterSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<path fill="currentColor" fill-opacity="0" stroke="currentColor" stroke-dasharray="64" stroke-dashoffset="64" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.89 7.34c-0.09 0.33 -0.49 1.16 -1.17 1.95c-0.45 8.68 -8.87 11.5 -14.64 8.59c-0.79 -1.05 2.85 -0.62 4.18 -2.63c-5.03 -2.57 -4.63 -9.44 -3.62 -9.16c2.37 3.19 6.19 3.48 6.81 3.19c0 -0.73 -0.31 -2.32 1.41 -3.65c0.99 -0.71 3.06 -1.34 4.93 0.69c0.32 0.21 0.78 0.3 1.47 0.15c0.41 -0.21 0.95 -0.07 0.67 0.66Z">
-		<animate fill="freeze" attributeName="fill-opacity" begin="0.6s" dur="0.5s" values="0;1" />
-		<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
-	</path>
-</svg>`;
-
-const blueskySVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<path fill="none" stroke="currentColor" stroke-dasharray="80" stroke-dashoffset="80" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.47 5.94c1.83 1.37 3.81 4.14 4.53 5.63c0.72 -1.49 2.7 -4.26 4.53 -5.63c1.33 -0.99 3.47 -1.75 3.47 0.68c0 0.49 -0.28 4.08 -0.45 4.66c-0.57 2.03 -2.65 2.55 -4.5 2.23c3.24 0.55 4.06 2.36 2.28 4.17c-3.38 3.44 -4.85 -0.87 -5.23 -1.97c-0.07 -0.2 -0.1 -0.3 -0.1 -0.22c-0 -0.08 -0.03 0.02 -0.1 0.22c-0.38 1.1 -1.86 5.41 -5.23 1.97c-1.78 -1.81 -0.96 -3.63 2.28 -4.17c-1.85 0.31 -3.93 -0.21 -4.5 -2.23c-0.17 -0.58 -0.45 -4.18 -0.45 -4.66c0 -2.43 2.14 -1.67 3.47 -0.68Z">
-		<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="80;0" />
-	</path>
-</svg>`;
-
-
-const linkedinSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<circle cx="4" cy="4" r="2" fill="currentColor" fill-opacity="0">
-		<animate fill="freeze" attributeName="fill-opacity" dur="0.15s" values="0;1" />
-	</circle>
-	<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
-		<path stroke-dasharray="12" stroke-dashoffset="12" d="M4 10v10">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.15s" dur="0.2s" values="12;0" />
-		</path>
-		<path stroke-dasharray="12" stroke-dashoffset="12" d="M10 10v10">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.45s" dur="0.2s" values="12;0" />
-		</path>
-		<path stroke-dasharray="24" stroke-dashoffset="24" d="M10 15c0 -2.76 2.24 -5 5 -5c2.76 0 5 2.24 5 5v5">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.65s" dur="0.2s" values="24;0" />
-		</path>
-	</g>
-</svg>`;
-
-const youtubeSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<mask id="lineMdYoutubeFilled0">
-		<g fill="none" fill-opacity="0" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-			<path fill="#fff" stroke-dasharray="64" stroke-dashoffset="64" d="M12 5c9 0 9 0 9 7c0 7 0 7 -9 7c-9 0 -9 0 -9 -7c0 -7 0 -7 9 -7Z">
-				<animate fill="freeze" attributeName="fill-opacity" begin="0.6s" dur="0.5s" values="0;1" />
-				<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
-			</path>
-			<path fill="#000" stroke="none" d="M12 11L12 12L12 13z">
-				<animate fill="freeze" attributeName="d" begin="1.1s" dur="0.2s" values="M12 11L12 12L12 13z;M10 8.5L16 12L10 15.5z" />
-				<set fill="freeze" attributeName="fill-opacity" begin="1.1s" to="1" />
-			</path>
-		</g>
-	</mask>
-	<rect width="24" height="24" fill="currentColor" mask="url(#lineMdYoutubeFilled0)" />
-</svg>`;
-
-const tiktokSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<mask id="lineMdTiktok0">
-		<g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-			<path fill="#fff" stroke="none" d="M16.6 5.82c-0.68 -0.78 -1.06 -1.78 -1.06 -2.82h-3.09v12.4c-0.02 0.67 -0.31 1.31 -0.79 1.77c-0.48 0.47 -1.13 0.73 -1.8 0.73c-1.42 0 -2.6 -1.16 -2.6 -2.6c0 -1.72 1.66 -3.01 3.37 -2.48v-3.16c-3.45 -0.46 -6.47 2.22 -6.47 5.64c0 3.33 2.76 5.7 5.69 5.7c3.14 0 5.69 -2.55 5.69 -5.7v-6.29c1.25 0.9 2.76 1.38 4.3 1.38v-3.09c0 0 -1.88 0.09 -3.24 -1.48Z" />
-			<path stroke="#000" stroke-dasharray="36" stroke-dashoffset="72" stroke-width="4" d="M11 11h-1c-2.21 0 -4.5 1.79 -4.5 4c0 2.21 1.5 4.5 4.5 4.5c2.21 0 4 -2.29 4 -4.5v-12.5">
-				<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;36" />
-			</path>
-			<path stroke="#000" stroke-dasharray="10" stroke-dashoffset="20" stroke-width="4" d="M18 2.5v8">
-				<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.5s" dur="0.1s" values="20;10" />
-			</path>
-		</g>
-	</mask>
-	<rect width="24" height="24" fill="currentColor" mask="url(#lineMdTiktok0)" />
-</svg>`;
-
-const spotifySVG = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
-	<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5">
-		<path stroke-dasharray="64" stroke-dashoffset="64" d="M2 12c0 -5.52 4.48 -10 10 -10c5.52 0 10 4.48 10 10c0 5.52 -4.48 10 -10 10c-5.52 0 -10 -4.48 -10 -10Z">
-			<animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
-		</path>
-		<path stroke-dasharray="8" stroke-dashoffset="8" d="M8.63 15.31c2.18 -0.58 4.49 -0.34 6.5 0.69">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0" />
-		</path>
-		<path stroke-dasharray="12" stroke-dashoffset="12" d="M7.5 12.07c1.1 -0.37 2.28 -0.57 3.5 -0.57c2.02 0 3.92 0.55 5.55 1.5">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="12;0" />
-		</path>
-		<path stroke-dasharray="14" stroke-dashoffset="14" d="M7 8.91c1.38 -0.59 2.9 -0.91 4.5 -0.91c2.41 0 4.65 0.74 6.5 2">
-			<animate fill="freeze" attributeName="stroke-dashoffset" begin="1s" dur="0.2s" values="14;0" />
-		</path>
-	</g>
-</svg>`;
-
-const socialLinks = [
-  {
-    href: `https://www.github.com/thetrueferret`,
-    label: "GitHub",
-    svg: githubSVG,
-  },
-  {
-    href: "https://www.youtube.com/@trueferret",
-    label: "YouTube",
-    svg: youtubeSVG,
-  },
-  {
-    href: "https://twitter.com/trueferret",
-    label: "Twitter/X",
-    svg: twitterSVG,
-  },
-  {
-    href: "https://open.spotify.com/user/kt8vvrzng27mfuj63gc4aloos?si=86804afbff604073",
-    label: "Spotify",
-    svg: spotifySVG,
-  },
-  {
-    href: "https://www.tiktok.com/@trueferret",
-    label: "TikTok",
-    svg: tiktokSVG,
-  },
-  {
-    href: "https://bsky.app/profile/trueferret.bsky.social",
-    label: "Bluesky",
-    svg: blueskySVG,
-  },
-  {
-    href: "https://instagram.com/trueferret",
-    label: "Instagram",
-    svg: instagramSVG,
-  },
-  {
-    href: "https://linkedin.com/in/jarno-fret",
-    label: "LinkedIn",
-    svg: linkedinSVG,
   },
 ];
 ---
@@ -244,20 +89,93 @@ const socialLinks = [
         <div class="sm:col-span-2 lg:col-span-1">
           <h4 class="text-xl font-semibold text-zinc-300 mb-3">Social Media</h4>
           <div class="flex flex-wrap space-x-5 space-y-4 mb-4">
-            {
-              socialLinks.map((social) => (
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-                  title={social.label}
-                >
-                  <Fragment set:html={social.svg} />
-                </a>
-              ))
-            }
+            <a
+            href="https://www.github.com/thetrueferret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="GitHub"
+          >
+            <Icon name="line-md:github-loop" size={48} />
+          </a>
+          
+          <a
+            href="https://www.youtube.com/@trueferret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="YouTube"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="YouTube"
+          >
+            <Icon name="line-md:youtube-filled" size={48} />
+          </a>
+          
+          <a
+            href="https://twitter.com/trueferret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Twitter/X"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="Twitter/X"
+          >
+            <Icon name="line-md:twitter-filled" size={48} />
+          </a>
+          
+          <a
+            href="https://open.spotify.com/user/kt8vvrzng27mfuj63gc4aloos?si=86804afbff604073"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Spotify"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="Spotify"
+          >
+            <Icon name="line-md:spotify" size={48} />
+          </a>
+          
+          <a
+            href="https://www.tiktok.com/@trueferret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="TikTok"
+          >
+            <Icon name="line-md:tiktok" size={48} />
+          </a>
+          
+          <a
+            href="https://bsky.app/profile/trueferret.bsky.social"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Bluesky"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="Bluesky"
+          >
+            <Icon name="line-md:bluesky" size={48} />
+          </a>
+          
+          <a
+            href="https://instagram.com/trueferret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="Instagram"
+          >
+            <Icon name="line-md:instagram" size={48} />
+          </a>
+          
+          <a
+            href="https://linkedin.com/in/jarno-fret"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+            title="LinkedIn"
+          >
+            <Icon name="line-md:linkedin" size={48} />
+          </a>
           </div>
         </div>
       </div>
