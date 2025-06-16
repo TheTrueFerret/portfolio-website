@@ -1,0 +1,29 @@
+[
+  {
+    "company": "Karel de Grote Hogeschool",
+    "image": "/assets/images/kdg-logo.png",
+    "title": "Professional Bachelor:\n Applied Computer Science",
+    "date": "2021 - 2025",
+    "description": "",
+    "order": 1,
+    "isWork": false
+  },
+  {
+    "company": "Sololearn",
+    "image": "/assets/images/sololearn-logo.png",
+    "title": "CSS Course Certificate",
+    "date": "march 2018",
+    "description": "",
+    "order": 2,
+    "isWork": false
+  },
+  {
+    "company": "Sololearn",
+    "image": "/assets/images/sololearn-logo.png",
+    "title": "HTML Course Certificate",
+    "date": "april 2017",
+    "description": "",
+    "order": 3,
+    "isWork": false
+  }
+]

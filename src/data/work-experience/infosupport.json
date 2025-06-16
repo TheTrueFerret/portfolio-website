@@ -1,8 +1,0 @@
-{
-  "company": "InfoSupport",
-  "image": "/assets/images/info-support-logo.png",
-  "title": "Internship",
-  "date": "April 2025 - June 2025",
-  "description": "Built InfoQuest, an app that helps coworkers give compliments and collect digital cards. Made the backend with Kotlin, Spring Boot, and Spring Modulith, using PostgreSQL for the database. Created a mobile app that works on different phones using Kotlin Multiplatform and built a website with React. Added NFC features so users can interact by touching phones together and used AI to create card images. Worked in a team of 2 and learned from experienced developers. If you are a student reading this, I really recommend doing your internship at Info Support!",
-  "order": 1
-}

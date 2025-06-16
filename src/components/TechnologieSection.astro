@@ -1,0 +1,332 @@
+---
+import { Icon } from "astro-icon/components";
+
+const frontendTechs = [
+  {
+    name: "simple-icons:tailwindcss",
+    title: "Tailwind CSS",
+    description: "Utility-first CSS framework for rapid UI development",
+  },
+  {
+    name: "simple-icons:react",
+    title: "React",
+    description: "JavaScript library for building user interfaces",
+  },
+  {
+    name: "simple-icons:nextdotjs",
+    title: "Next.js",
+    description: "React framework for production with SSR and SSG",
+  },
+  {
+    name: "simple-icons:reactrouter",
+    title: "React Router",
+    description: "Declarative routing for React applications",
+  },
+  {
+    name: "simple-icons:reactquery",
+    title: "React Query",
+    description: "Data fetching and caching library for React",
+  },
+  {
+    name: "cib:typescript",
+    title: "TypeScript",
+    description:
+      "Typed superset of JavaScript for better development experience",
+  },
+  {
+    name: "cib:javascript",
+    title: "JavaScript",
+    description: "Programming language for web development",
+  },
+  {
+    name: "simple-icons:vite",
+    title: "Vite",
+    description:
+      "Fast build tool and development server for modern web projects",
+  },
+  {
+    name: "simple-icons:svelte",
+    title: "Svelte",
+    description: "Compile-time framework for building web applications",
+  },
+  {
+    name: "simple-icons:astro",
+    title: "Astro",
+    description: "Static site generator for modern web development",
+  },
+  {
+    name: "simple-icons:jetpackcompose",
+    title: "Jetpack Compose",
+    description: "Modern toolkit for building native Android UI",
+  },
+  {
+    name: "cib:html5-shield",
+    title: "HTML5",
+    description: "Markup language for creating web pages and applications",
+  },
+  {
+    name: "cib:css3-shiled",
+    title: "CSS3",
+    description: "Style sheet language for describing web page presentation",
+  },
+];
+
+const backendTechs = [
+  {
+    name: "cib:java",
+    title: "Java",
+    description:
+      "Object-oriented programming language for enterprise applications",
+  },
+  {
+    name: "simple-icons:spring",
+    title: "Spring",
+    description: "Java framework for building enterprise applications",
+  },
+  {
+    name: "simple-icons:gradle",
+    title: "Gradle",
+    description:
+      "Build automation tool for multi-language software development",
+  },
+  {
+    name: "simple-icons:dotnet",
+    title: ".NET",
+    description: "Microsoft's development platform for building applications",
+  },
+  {
+    name: "simple-icons:postgresql",
+    title: "PostgreSQL",
+    description: "Open-source relational database management system",
+  },
+  {
+    name: "simple-icons:mysql",
+    title: "MySQL",
+    description: "Popular open-source relational database",
+  },
+  {
+    name: "simple-icons:sqlite",
+    title: "SQLite",
+    description: "Lightweight, embedded SQL database engine",
+  },
+  {
+    name: "simple-icons:python",
+    title: "Python",
+    description:
+      "High-level programming language for general-purpose programming",
+  },
+  {
+    name: "simple-icons:apachespark",
+    title: "Apache Spark",
+    description: "Unified analytics engine for large-scale data processing",
+  },
+  {
+    name: "simple-icons:kotlin",
+    title: "Kotlin",
+    description:
+      "Modern programming language for Android and server-side development",
+  },
+  {
+    name: "simple-icons:docker",
+    title: "Docker",
+    description:
+      "Platform for developing, shipping, and running applications in containers",
+  },
+  {
+    name: "simple-icons:arduino",
+    title: "Arduino",
+    description:
+      "Open-source electronics platform for building digital devices",
+  },
+  {
+    name: "cib:firebase",
+    title: "Firebase",
+    description:
+      "Google's platform for building and scaling mobile and web applications",
+  },
+];
+
+const tools = [
+  {
+    name: "simple-icons:obsidian",
+    title: "Obsidian",
+    description: "Knowledge management and note-taking application",
+  },
+  {
+    name: "simple-icons:excalidraw",
+    title: "Excalidraw",
+    description: "Virtual whiteboard for sketching hand-drawn diagrams",
+  },
+  {
+    name: "simple-icons:notion",
+    title: "Notion",
+    description: "All-in-one workspace for notes, docs, and project management",
+  },
+  {
+    name: "simple-icons:davinciresolve",
+    title: "DaVinci Resolve",
+    description: "Professional video editing and color correction software",
+  },
+  {
+    name: "simple-icons:gimp",
+    title: "GIMP",
+    description: "Free and open-source image editor",
+  },
+  {
+    name: "simple-icons:obsstudio",
+    title: "OBS Studio",
+    description: "Free software for video recording and live streaming",
+  },
+  {
+    name: "simple-icons:git",
+    title: "Git",
+    description: "Distributed version control system for tracking changes",
+  },
+  {
+    name: "simple-icons:github",
+    title: "GitHub",
+    description: "Web-based Git repository hosting service",
+  },
+  {
+    name: "simple-icons:gitlab",
+    title: "GitLab",
+    description: "DevOps platform with Git repository management",
+  },
+  {
+    name: "simple-icons:wezterm",
+    title: "WezTerm",
+    description: "GPU-accelerated cross-platform terminal emulator",
+  },
+  {
+    name: "simple-icons:figma",
+    title: "Figma",
+    description: "Collaborative interface design and prototyping tool",
+  },
+  {
+    name: "simple-icons:intellijidea",
+    title: "IntelliJ IDEA",
+    description: "Integrated development environment for Java development",
+  },
+  {
+    name: "simple-icons:rider",
+    title: "JetBrains Rider",
+    description: "Cross-platform .NET IDE",
+  },
+  {
+    name: "simple-icons:pycharm",
+    title: "PyCharm",
+    description: "Python IDE for professional developers",
+  },
+  {
+    name: "simple-icons:datagrip",
+    title: "DataGrip",
+    description: "Database IDE for working with SQL databases",
+  },
+  {
+    name: "cib:visual-studio-code",
+    title: "VS Code",
+    description: "Lightweight but powerful source code editor",
+  },
+  {
+    name: "simple-icons:vim",
+    title: "Vim",
+    description: "Highly configurable text editor for efficient coding",
+  },
+  {
+    name: "simple-icons:claude",
+    title: "Claude",
+    description: "AI assistant for coding, writing, and analysis",
+  },
+  {
+    name: "simple-icons:googlegemini",
+    title: "Google Gemini",
+    description: "Google's advanced AI model for various tasks",
+  },
+  {
+    name: "simple-icons:zenbrowser",
+    title: "Zen Browser",
+    description: "Privacy-focused web browser",
+  },
+  {
+    name: "simple-icons:vivaldi",
+    title: "Vivaldi",
+    description: "Customizable web browser with advanced features",
+  },
+];
+---
+
+<section class="w-full pt-16 pb-32">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="pb-16">
+      <h2 class="text-3xl font-bold mb-6">Frontend Technologies</h2>
+      <div class="flex flex-row gap-4 flex-wrap">
+        {
+          frontendTechs.map((tech) => (
+            <div class="tech-item relative group">
+              <Icon
+                class="text-zinc-400 hover:text-zinc-100 block w-12 h-12"
+                name={tech.name}
+                size={48}
+              />
+              <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-zinc-950 text-zinc-100 border-2 border-zinc-700 px-3 py-2 shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none z-10 w-64 text-center hover:block">
+                <span class="hidden sm:block absolute -top-3 left-3 px-2 bg-neutral-950 text-zinc-500 text-sm font-semibold">
+                  whatis
+                </span>
+                <div class="font-semibold text-sm">{tech.title}</div>
+                <div class="text-xs text-zinc-300 mt-1">{tech.description}</div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="pb-16">
+      <h2 class="text-3xl font-bold mb-6">Backend Technologies</h2>
+      <div class="flex flex-row gap-4 flex-wrap">
+        {
+          backendTechs.map((tech) => (
+            <div class="tech-item relative group">
+              <Icon
+                class="text-zinc-400 hover:text-zinc-100 block w-12 h-12"
+                name={tech.name}
+                size={48}
+              />
+              <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-zinc-950 text-zinc-100 border-2 border-zinc-700 px-3 py-2 shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none z-10 w-64 text-center hover:block">
+                <span class="hidden sm:block absolute -top-3 left-3 px-2 bg-neutral-950 text-zinc-500 text-sm font-semibold">
+                  whatis
+                </span>
+                <div class="font-semibold text-sm">{tech.title}</div>
+                <div class="text-xs text-zinc-300 mt-1">{tech.description}</div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-3xl font-bold mb-6">Tools</h2>
+      <div class="flex flex-row flex-wrap gap-4">
+        {
+          tools.map((tech) => (
+            <div class="tech-item relative group">
+              <Icon
+                class="text-zinc-400 hover:text-zinc-100 block w-12 h-12"
+                name={tech.name}
+                size={48}
+              />
+              <div class="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-zinc-950 text-zinc-100 border-2 border-zinc-700 px-3 py-2 shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none z-10 w-64 text-center hover:block">
+                <span class="hidden sm:block absolute -top-3 left-3 px-2 bg-neutral-950 text-zinc-500 text-sm font-semibold">
+                  whatis
+                </span>
+                <div class="font-semibold text-sm">{tech.title}</div>
+                <div class="text-xs text-zinc-300 mt-1">{tech.description}</div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

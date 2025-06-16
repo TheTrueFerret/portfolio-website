@@ -1,20 +1,21 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from "astro:assets";
 import ExperienceItem from './ExperienceItem.astro';
 
-const workExperienceEntries = await getCollection('work');
-const educationExperienceEntries = await getCollection('education');
+const experienceEntries = await getCollection('experience');
 
-const workExperience = workExperienceEntries
-  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
-  .map(entry => entry.data);
+const allExperiences = experienceEntries.flatMap(entry => entry.data);
 
-const educationExperience = educationExperienceEntries
-  .sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
-  .map(entry => entry.data);
+const workExperience = allExperiences
+  .filter(item => item.isWork === true)
+  .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+const educationExperience = allExperiences
+  .filter(item => item.isWork === false)
+  .sort((a, b) => (a.order || 0) - (b.order || 0));
 
 const images = import.meta.glob('/src/assets/images/**/*');
+
 const getImageSrc = async (imagePath: string) => {
   if (!imagePath) return null;
   const fullPath = `/src${imagePath}`;
@@ -37,13 +38,13 @@ const getImageSrc = async (imagePath: string) => {
       </button>
       <button
         id="education-tab"
-        class="tab-button w-full px-6 py-2 border-2 font-semibold border-zinc-700 bg-zinc-950 text-white hover:border-zinc-300 hover:text-zinc-300"
+        class="tab-button w-full px-6 py-2 border-2 font-semibold border-zinc-700 bg-zinc-950 text-zinc-100 hover:border-zinc-300 hover:text-zinc-300"
       >
         Education
       </button>
     </div>
     
-    <div class="md:pl-24 flex flex-col justify-center p-4 border-2 border-zinc-700 hover:border-zinc-400">
+    <div class="md:pl-24 flex flex-col justify-center p-4 border-2 border-zinc-700 hover:border-zinc-300">
       <!-- Work Timeline -->
       <div id="work-content" class="tab-content">
         {workExperience.map(async (item) => {
@@ -74,22 +75,22 @@ const getImageSrc = async (imagePath: string) => {
   const educationContent = document.getElementById('education-content');
 
   function showWork() {
-    workTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:text-zinc-300');
+    workTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-zinc-100', 'hover:text-zinc-300');
     workTab?.classList.add('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
     
     educationTab?.classList.remove('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
-    educationTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:border-zinc-300', 'hover:text-zinc-300');
+    educationTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-zinc-100', 'hover:border-zinc-300', 'hover:text-zinc-300');
 
     workContent?.style.setProperty('display', 'block');
     educationContent?.style.setProperty('display', 'none');
   }
 
   function showEducation() {
-    educationTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:text-zinc-300');
+    educationTab?.classList.remove('border-zinc-700', 'bg-zinc-950', 'text-zinc-100', 'hover:text-zinc-300');
     educationTab?.classList.add('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
     
     workTab?.classList.remove('border-zinc-300', 'bg-zinc-300', 'text-zinc-900');
-    workTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-white', 'hover:border-zinc-300', 'hover:text-zinc-300');
+    workTab?.classList.add('border-zinc-700', 'bg-zinc-950', 'text-zinc-100', 'hover:border-zinc-300', 'hover:text-zinc-300');
 
     educationContent?.style.setProperty('display', 'block');
     workContent?.style.setProperty('display', 'none');
