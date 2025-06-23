@@ -1,9 +1,9 @@
 ---
 import { Image } from "astro:assets";
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 export interface ExperienceItemProps {
-  projectItem: CollectionEntry<'projects'>; 
+  projectItem: CollectionEntry<"projects">;
   imageSrc: ImageMetadata | null;
 }
 
@@ -13,7 +13,12 @@ const { projectItem, imageSrc } = Astro.props;
 <li
   class="bg-neutral-950 border-2 border-zinc-700 hover:border-zinc-400 hover:shadow-xl flex flex-col"
 >
-  <a href={projectItem.data.projectUrl} class="block p-6 flex-grow">
+  <a
+    href={projectItem.data.projectUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="block p-7 flex-grow"
+  >
     {
       projectItem.data.imageUrl && imageSrc && (
         <Image
@@ -25,9 +30,7 @@ const { projectItem, imageSrc } = Astro.props;
         />
       )
     }
-    <h3
-      class="text-xl sm:text-2xl font-semibold text-zinc-100 mb-2"
-    >
+    <h3 class="text-xl sm:text-2xl font-semibold text-zinc-100 mb-2">
       {projectItem.data.title}
     </h3>
     <p class="text-zinc-400 text-sm mb-3">
@@ -42,8 +45,6 @@ const { projectItem, imageSrc } = Astro.props;
     <p class="text-zinc-300 mb-4 text-base leading-relaxed flex-grow">
       {projectItem.data.description}
     </p>
-    <div class="mt-auto">
-      
-    </div>
+    <div class="mt-auto"></div>
   </a>
 </li>

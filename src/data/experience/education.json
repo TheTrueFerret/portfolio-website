@@ -3,9 +3,18 @@
     "company": "Karel de Grote Hogeschool",
     "image": "/assets/images/kdg-logo.png",
     "title": "Professional Bachelor:\n Applied Computer Science",
-    "date": "2021 - 2025",
+    "date": "september 2021 - september 2025",
     "description": "",
     "order": 1,
+    "isWork": false
+  },
+  {
+    "company": "Vrij Technisch Instituut",
+    "image": "/assets/images/VTI-Logo.png",
+    "title": "Secondary Education:\n Electrical Installation Techniques",
+    "date": "september, 2015 - june 2021",
+    "description": "",
+    "order": 2,
     "isWork": false
   },
   {
@@ -14,7 +23,7 @@
     "title": "CSS Course Certificate",
     "date": "march 2018",
     "description": "",
-    "order": 2,
+    "order": 3,
     "isWork": false
   },
   {
@@ -23,7 +32,7 @@
     "title": "HTML Course Certificate",
     "date": "april 2017",
     "description": "",
-    "order": 3,
+    "order": 4,
     "isWork": false
   }
 ]

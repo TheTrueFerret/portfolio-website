@@ -1,5 +1,5 @@
 ---
-import { Icon } from 'astro-icon/components'
+import { Icon } from "astro-icon/components";
 
 const currentYear = new Date().getFullYear();
 
@@ -12,9 +12,12 @@ const navLinks = [
 
 const otherWebsites = [
   {
-    href: "",
-    text: "Soon...",
-    target: "",
+    href: "https://ferret.media",
+    text: "Ferret Media",
+  },
+  {
+    href: "https://lull-app.com",
+    text: "lull app",
   },
 ];
 ---
@@ -62,23 +65,14 @@ const otherWebsites = [
                 <li>
                   <a
                     href={site.href}
-                    target={site.target || "_self"}
-                    rel={
-                      site.target === "_blank"
-                        ? "noopener noreferrer"
-                        : undefined
-                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
                     class="text-zinc-400 hover:text-zinc-100 text-md"
                   >
                     {site.text}
-                    {site.target === "_blank" && (
-                      <span
-                        class="ml-1.5 text-xs opacity-60"
-                        aria-hidden="true"
-                      >
-                        ↗
-                      </span>
-                    )}
+                    <span class="ml-1.5 text-xs opacity-60" aria-hidden="true">
+                      ↗
+                    </span>
                   </a>
                 </li>
               ))
@@ -90,92 +84,92 @@ const otherWebsites = [
           <h4 class="text-xl font-semibold text-zinc-300 mb-3">Social Media</h4>
           <div class="flex flex-wrap space-x-5 space-y-4 mb-4">
             <a
-            href="https://www.github.com/thetrueferret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="GitHub"
-          >
-            <Icon name="line-md:github-loop" size={48} />
-          </a>
-          
-          <a
-            href="https://www.youtube.com/@trueferret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="YouTube"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="YouTube"
-          >
-            <Icon name="line-md:youtube-filled" size={48} />
-          </a>
-          
-          <a
-            href="https://twitter.com/trueferret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Twitter/X"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="Twitter/X"
-          >
-            <Icon name="line-md:twitter-filled" size={48} />
-          </a>
-          
-          <a
-            href="https://open.spotify.com/user/kt8vvrzng27mfuj63gc4aloos?si=86804afbff604073"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Spotify"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="Spotify"
-          >
-            <Icon name="line-md:spotify" size={48} />
-          </a>
-          
-          <a
-            href="https://www.tiktok.com/@trueferret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="TikTok"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="TikTok"
-          >
-            <Icon name="line-md:tiktok" size={48} />
-          </a>
-          
-          <a
-            href="https://bsky.app/profile/trueferret.bsky.social"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Bluesky"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="Bluesky"
-          >
-            <Icon name="line-md:bluesky" size={48} />
-          </a>
-          
-          <a
-            href="https://instagram.com/trueferret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="Instagram"
-          >
-            <Icon name="line-md:instagram" size={48} />
-          </a>
-          
-          <a
-            href="https://linkedin.com/in/jarno-fret"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
-            title="LinkedIn"
-          >
-            <Icon name="line-md:linkedin" size={48} />
-          </a>
+              href="https://www.github.com/thetrueferret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="GitHub"
+            >
+              <Icon name="line-md:github-loop" size={48} />
+            </a>
+
+            <a
+              href="https://www.youtube.com/@trueferret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="YouTube"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="YouTube"
+            >
+              <Icon name="line-md:youtube-filled" size={48} />
+            </a>
+
+            <a
+              href="https://twitter.com/trueferret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Twitter/X"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="Twitter/X"
+            >
+              <Icon name="line-md:twitter-filled" size={48} />
+            </a>
+
+            <a
+              href="https://open.spotify.com/user/kt8vvrzng27mfuj63gc4aloos?si=86804afbff604073"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="Spotify"
+            >
+              <Icon name="line-md:spotify" size={48} />
+            </a>
+
+            <a
+              href="https://www.tiktok.com/@trueferret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="TikTok"
+            >
+              <Icon name="line-md:tiktok" size={48} />
+            </a>
+
+            <a
+              href="https://bsky.app/profile/trueferret.bsky.social"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Bluesky"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="Bluesky"
+            >
+              <Icon name="line-md:bluesky" size={48} />
+            </a>
+
+            <a
+              href="https://instagram.com/trueferret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="Instagram"
+            >
+              <Icon name="line-md:instagram" size={48} />
+            </a>
+
+            <a
+              href="https://linkedin.com/in/jarno-fret"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+              title="LinkedIn"
+            >
+              <Icon name="line-md:linkedin" size={48} />
+            </a>
           </div>
         </div>
       </div>
