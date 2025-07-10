@@ -9,27 +9,20 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/svelte": "^7.0.13",
-    "@tailwindcss/vite": "^4.1.5",
-    "astro": "^5.7.10",
+    "@astrojs/svelte": "^7.1.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "astro": "^5.11.0",
     "astro-icon": "^1.1.5",
     "astro-seo": "^0.8.4",
     "gsap": "^3.13.0",
-    "svelte": "^5.28.6",
-    "tailwindcss": "^4.1.5",
+    "svelte": "^5.35.5",
+    "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@iconify-json/cib": "^1.2.2",
     "@iconify-json/line-md": "^1.2.8",
-    "@iconify-json/simple-icons": "^1.2.38",
+    "@iconify-json/simple-icons": "^1.2.42",
     "@iconify/tailwind4": "^1.0.6"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.0.0",
-    "@rollup/rollup-linux-x64-musl": "^4.0.0",
-    "@rollup/rollup-win32-x64-msvc": "^4.0.0",
-    "@rollup/rollup-darwin-x64": "^4.0.0",
-    "@rollup/rollup-darwin-arm64": "^4.0.0"
   }
 }
