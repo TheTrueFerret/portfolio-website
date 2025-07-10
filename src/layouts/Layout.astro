@@ -2,8 +2,15 @@
 import Navigation from '../components/Navigation.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
+import { SEO } from 'astro-seo';
 
-const { pageTitle } = Astro.props;
+const { 
+  pageTitle,
+  description = "Jarno Fret's aka TrueFerret's Portfolio Website",
+  canonical
+} = Astro.props;
+
+const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -12,7 +19,46 @@ const { pageTitle } = Astro.props;
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>{pageTitle}</title>
+		<SEO
+      title={pageTitle}
+      description={description}
+      canonical={canonicalURL.toString()}
+      noindex={false}
+      nofollow={false}
+      openGraph={{
+        basic: {
+          title: pageTitle,
+          type: "website",
+          image: new URL("/og-image.png", Astro.site).toString(),
+          url: canonicalURL.toString(),
+        },
+        optional: {
+          description: description,
+          siteName: "TrueFerret's Portfolio",
+        },
+        image: {
+          alt: "Website preview",
+          width: 1200,
+          height: 630,
+          type: "image/png",
+        },
+      }}
+      twitter={{
+        card: "summary_large_image",
+        site: "@TrueFerret",
+        creator: "@TrueFerret",
+        title: pageTitle,
+        description: description,
+        image: new URL("/og-image.png", Astro.site).toString(),
+        imageAlt: "Website preview",
+      }}
+      extend={{
+        meta: [
+          { name: "theme-color", content: "#09090b" },
+          { name: "color-scheme", content: "dark" },
+        ],
+      }}
+    />
 	</head>
 	<body class='text-zinc-100 bg-zinc-950'>
 		<Navigation />
@@ -20,3 +66,4 @@ const { pageTitle } = Astro.props;
 		<Footer />
 	</body>
 </html>
+
