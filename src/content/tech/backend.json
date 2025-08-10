@@ -1,0 +1,67 @@
+[
+  {
+    "name": "cib:java",
+    "title": "Java",
+    "description": "Object-oriented programming language for enterprise applications"
+  },
+  {
+    "name": "simple-icons:spring",
+    "title": "Spring",
+    "description": "Java framework for building enterprise applications"
+  },
+  {
+    "name": "simple-icons:gradle",
+    "title": "Gradle",
+    "description": "Build automation tool for multi-language software development"
+  },
+  {
+    "name": "simple-icons:dotnet",
+    "title": ".NET",
+    "description": "Microsoft's development platform for building applications"
+  },
+  {
+    "name": "simple-icons:postgresql",
+    "title": "PostgreSQL",
+    "description": "Open-source relational database management system"
+  },
+  {
+    "name": "simple-icons:mysql",
+    "title": "MySQL",
+    "description": "Popular open-source relational database"
+  },
+  {
+    "name": "simple-icons:sqlite",
+    "title": "SQLite",
+    "description": "Lightweight, embedded SQL database engine"
+  },
+  {
+    "name": "simple-icons:python",
+    "title": "Python",
+    "description": "High-level programming language for general-purpose programming"
+  },
+  {
+    "name": "simple-icons:apachespark",
+    "title": "Apache Spark",
+    "description": "Unified analytics engine for large-scale data processing"
+  },
+  {
+    "name": "simple-icons:kotlin",
+    "title": "Kotlin",
+    "description": "Modern programming language for Android and server-side development"
+  },
+  {
+    "name": "simple-icons:docker",
+    "title": "Docker",
+    "description": "Platform for developing, shipping, and running applications in containers"
+  },
+  {
+    "name": "simple-icons:arduino",
+    "title": "Arduino",
+    "description": "Open-source electronics platform for building digital devices"
+  },
+  {
+    "name": "cib:firebase",
+    "title": "Firebase",
+    "description": "Google's platform for building and scaling mobile and web applications"
+  }
+]

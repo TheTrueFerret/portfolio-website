@@ -1,5 +1,12 @@
 ---
+const currentPath = Astro.url.pathname;
 
+const navLinks = [
+  { href: "/", label: "about" },
+  { href: "/projects/", label: "projects" },
+  { href: "/blog/", label: "blog" },
+  { href: "/contact/", label: "contact" },
+];
 ---
 
 <header class="w-full pt-6">
@@ -9,10 +16,18 @@
     <nav class="group relative col-span-4 sm:col-start-1 sm:col-span-4 border-2 border-zinc-700 hover:border-zinc-400">
       <span class="absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300">navbar</span>
       <div class="grid grid-cols-4 gap-0 text-center text-white text-md sm:text-2xl">
-        <a href="/" class="hover:text-zinc-500 p-4 sm:p-6">about</a>
-        <a href="/projects/" class="hover:text-zinc-500 p-4 sm:p-6">projects</a>
-        <a href="/blog/" class="hover:text-zinc-500 p-4 sm:p-6">blog</a>
-        <a href="/contact/" class="hover:text-zinc-500 p-4 sm:p-6">contact</a>
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class={`p-2 m-2 sm:p-2 sm:m-4  ${
+              currentPath === link.href
+                ? "bg-neutral-700 text-neutral-950 group-hover:bg-neutral-300 font-semibold"
+                : "hover:text-zinc-500"
+            }`}
+          >
+            {link.label}
+          </a>
+        ))}
       </div>
     </nav>
 

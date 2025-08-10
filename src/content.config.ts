@@ -3,7 +3,7 @@ import { glob } from 'astro/loaders';
 
 
 const experienceCollection = defineCollection({
-  loader: glob({ pattern: "**/*.json", base: "./src/data/experience" }),
+  loader: glob({ pattern: "**/*.json", base: "./src/content/experience" }),
   schema: z.array(z.object({
     company: z.string(),
     image: z.string().optional(),
@@ -16,8 +16,18 @@ const experienceCollection = defineCollection({
 });
 
 
+const techCollection = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/tech" }),
+  schema: z.array(z.object({
+    name: z.string(),
+    title: z.string(),
+    description: z.string(),
+  })),
+})
+
+
 const blogCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/data/posts" }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/posts" }),
   schema: z.object({
     title: z.string(),
     pubDate: z.date(),
@@ -29,7 +39,7 @@ const blogCollection = defineCollection({
 
 
 const projectCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/data/projects" }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/projects" }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
@@ -46,6 +56,7 @@ const projectCollection = defineCollection({
 
 export const collections = {
   experience: experienceCollection,
+  tech: techCollection,
   blog: blogCollection,
   projects: projectCollection,
 };

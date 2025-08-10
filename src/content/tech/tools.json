@@ -1,0 +1,107 @@
+[
+  {
+    "name": "simple-icons:obsidian",
+    "title": "Obsidian",
+    "description": "Knowledge management and note-taking application"
+  },
+  {
+    "name": "simple-icons:excalidraw",
+    "title": "Excalidraw",
+    "description": "Virtual whiteboard for sketching hand-drawn diagrams"
+  },
+  {
+    "name": "simple-icons:notion",
+    "title": "Notion",
+    "description": "All-in-one workspace for notes, docs, and project management"
+  },
+  {
+    "name": "simple-icons:davinciresolve",
+    "title": "DaVinci Resolve",
+    "description": "Professional video editing and color correction software"
+  },
+  {
+    "name": "simple-icons:gimp",
+    "title": "GIMP",
+    "description": "Free and open-source image editor"
+  },
+  {
+    "name": "simple-icons:obsstudio",
+    "title": "OBS Studio",
+    "description": "Free software for video recording and live streaming"
+  },
+  {
+    "name": "simple-icons:git",
+    "title": "Git",
+    "description": "Distributed version control system for tracking changes"
+  },
+  {
+    "name": "simple-icons:github",
+    "title": "GitHub",
+    "description": "Web-based Git repository hosting service"
+  },
+  {
+    "name": "simple-icons:gitlab",
+    "title": "GitLab",
+    "description": "DevOps platform with Git repository management"
+  },
+  {
+    "name": "simple-icons:wezterm",
+    "title": "WezTerm",
+    "description": "GPU-accelerated cross-platform terminal emulator"
+  },
+  {
+    "name": "simple-icons:figma",
+    "title": "Figma",
+    "description": "Collaborative interface design and prototyping tool"
+  },
+  {
+    "name": "simple-icons:intellijidea",
+    "title": "IntelliJ IDEA",
+    "description": "Integrated development environment for Java development"
+  },
+  {
+    "name": "simple-icons:rider",
+    "title": "JetBrains Rider",
+    "description": "Cross-platform .NET IDE"
+  },
+  {
+    "name": "simple-icons:pycharm",
+    "title": "PyCharm",
+    "description": "Python IDE for professional developers"
+  },
+  {
+    "name": "simple-icons:datagrip",
+    "title": "DataGrip",
+    "description": "Database IDE for working with SQL databases"
+  },
+  {
+    "name": "cib:visual-studio-code",
+    "title": "VS Code",
+    "description": "Lightweight but powerful source code editor"
+  },
+  {
+    "name": "simple-icons:vim",
+    "title": "Vim",
+    "description": "Highly configurable text editor for efficient coding"
+  },
+  {
+    "name": "simple-icons:claude",
+    "title": "Claude",
+    "description": "AI assistant for coding, writing, and analysis"
+  },
+  {
+    "name": "simple-icons:googlegemini",
+    "title": "Google Gemini",
+    "description": "Google's advanced AI model for various tasks"
+  },
+  {
+    "name": "simple-icons:zenbrowser",
+    "title": "Zen Browser",
+    "description": "Privacy-focused web browser"
+  },
+  {
+    "name": "simple-icons:vivaldi",
+    "title": "Vivaldi",
+    "description": "Customizable web browser with advanced features"
+  }
+]

@@ -15,6 +15,7 @@
     "astro-icon": "^1.1.5",
     "astro-seo": "^0.8.4",
     "gsap": "^3.13.0",
+    "iconify-icon": "^3.0.0",
     "sharp": "^0.34.3",
     "svelte": "^5.35.5",
     "tailwindcss": "^4.1.11",
