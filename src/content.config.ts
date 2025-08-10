@@ -27,12 +27,17 @@ const techCollection = defineCollection({
 
 
 const blogCollection = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/posts" }),
+  type: "content",
   schema: z.object({
     title: z.string(),
     pubDate: z.date(),
     description: z.string(),
-    imageUrl: z.string().optional(),
+    image: z
+      .object({
+        url: z.string(),
+        alt: z.string(),
+      })
+      .optional(),
     tags: z.array(z.string()).optional(),
   }),
 });

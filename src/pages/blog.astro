@@ -1,11 +1,25 @@
 ---
-import ComingSoon from '../components/ComingSoon.astro';
-import Layout from '../layouts/Layout.astro';
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import BlogItem from "../components/BlogItem.astro";
 
-const pageTitle = 'TrueFerret.dev | blog';
+const pageTitle = "TrueFerret.dev | Blog";
+const posts = await getCollection("blog");
+
+// Sort newest first
+posts.sort(
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+);
 ---
 
-
 <Layout pageTitle={pageTitle}>
-  <ComingSoon />
+  <section class="w-full py-10">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="flex flex-col gap-6">
+        {posts.map((post) => (
+          <BlogItem post={post} />
+        ))}
+      </div>
+    </div>
+  </section>
 </Layout>
