@@ -9,20 +9,20 @@ const navLinks = [
 ];
 ---
 
-<header class="w-full pt-6">
-  <div class="max-w-6xl mx-auto px-4 grid grid-cols-4 sm:grid-cols-5 gap-5">
+<header class="w-full pt-3 sm:pt-6">
+  <div class="max-w-6xl mx-auto px-1 sm:px-4 grid grid-cols-4 sm:grid-cols-5 gap-5">
 
     <!-- Navbar Section -->
     <nav class="group relative col-span-4 sm:col-start-1 sm:col-span-4 border-2 border-zinc-700 hover:border-zinc-400">
-      <span class="absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300">navbar</span>
+      <span class="absolute -top-4 left-6 px-2 bg-zinc-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300">navbar</span>
       <div class="grid grid-cols-4 gap-0 text-center text-white text-md sm:text-2xl">
         {navLinks.map((link) => (
           <a
             href={link.href}
             class={`p-2 m-2 sm:p-2 sm:m-4  ${
               currentPath === link.href
-                ? "bg-neutral-700 text-neutral-950 group-hover:bg-neutral-300 font-semibold"
-                : "hover:text-zinc-500"
+                ? "bg-zinc-700 text-zinc-950 font-semibold hover:bg-zinc-300"
+                : "hover:text-zinc-950 hover:bg-zinc-300 hover:font-semibold"
             }`}
           >
             {link.label}
@@ -32,8 +32,8 @@ const navLinks = [
     </nav>
 
     <!-- Theme Toggle Section -->
-    <div class="group relative col-span-4 sm:col-start-5 sm:col-span-1 border-2 border-zinc-700 hover:border-zinc-400">
-      <span class="absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300">theme</span>
+    <div class="hidden group sm:block sm:relative col-span-4 sm:col-start-5 sm:col-span-1 border-2 border-zinc-700 hover:border-zinc-400">
+      <span class="absolute -top-4 left-6 px-2 bg-zinc-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300">theme</span>
       <div class="h-full flex items-center justify-center">
         <button id="themeToggle" class="w-10 h-10" aria-label="Toggle theme">
           <p class="text-md font-semibold text-zinc-400">soon...</p>
