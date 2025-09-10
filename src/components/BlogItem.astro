@@ -1,0 +1,51 @@
+---
+interface Props {
+  post: {
+    slug: string;
+    data: {
+      title: string;
+      pubDate: Date;
+      description: string;
+      image?: { url: string; alt: string };
+      tags?: string[];
+    };
+  };
+}
+
+const { post } = Astro.props;
+---
+
+<a
+  href={`/blog/${post.slug}`}
+  class="group border-2 border-zinc-700 hover:border-zinc-300 p-4 flex flex-col md:flex-row gap-4"
+>
+  {post.data.image && (
+    <img
+      src={post.data.image.url}
+      alt={post.data.image.alt}
+      class="w-full md:w-48 h-32 object-cover"
+    />
+  )}
+  <div class="flex flex-col justify-between">
+    <div>
+      <h2 class="text-2xl font-semibold group-hover:text-zinc-300 transition-colors">
+        {post.data.title}
+      </h2>
+      <p class="text-sm text-zinc-400 mb-2">
+        {post.data.pubDate.toLocaleDateString()}
+      </p>
+      <p class="text-zinc-300">{post.data.description}</p>
+    </div>
+    {post.data.tags && (
+      <div class="mt-3 flex flex-wrap gap-2">
+        {post.data.tags.map((tag) => (
+          <span
+            class="text-xs bg-zinc-800 text-zinc-300 px-2 py-1 rounded"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+</a>

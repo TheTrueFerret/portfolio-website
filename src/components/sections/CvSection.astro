@@ -1,0 +1,47 @@
+---
+import { Icon } from "astro-icon/components";
+
+
+---
+
+<section class="w-full py-10">
+  <div class="relative max-w-6xl mx-auto px-4">
+    <div class="group relative border-2 border-zinc-700 hover:border-zinc-400">
+      <span
+        class="absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300"
+      >
+        CV
+      </span>
+      <div class="text-white font-medium sm:text-xl p-6 sm:p-8">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between
+                 gap-6"
+        >
+          <div class="flex-1">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold">
+              Want to download my CV?
+            </h2>
+            <p class="mt-2 text-zinc-400 max-w-xl">
+              Grab a copy of my CV to see experience, projects, and skills.
+              Click the button to download.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <a
+              href="/Private-CV-Jarno-Fret-English.pdf"
+              download
+              class="group inline-flex items-center gap-4 px-8 py-4 border-2 border-zinc-700 bg-zinc-950 hover:border-zinc-200
+                     hover:bg-zinc-200 active:bg-zinc-700 text-white hover:text-zinc-950"
+              aria-label="Download my CV"
+              title="Download CV"
+            >
+              <Icon name="line-md:download-loop" size={24} />
+              <span class="text-md font-semibold">Download CV</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
