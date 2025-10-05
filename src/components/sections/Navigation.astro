@@ -1,0 +1,43 @@
+---
+import SectionBorder from "../universals/SectionBorder.astro";
+
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: "/", label: "about" },
+  { href: "/projects/", label: "projects" },
+  { href: "/blog/", label: "blog" },
+  { href: "/contact/", label: "contact" },
+];
+---
+
+<header class="w-full pt-3 sm:pt-6">
+  <div
+    class="max-w-6xl mx-auto px-1 sm:px-4 grid grid-cols-4 gap-5"
+  >
+    <!-- Navbar Section -->
+    <nav class="col-span-4">
+      <SectionBorder sectionName="navbar">
+        <div
+          class="grid grid-cols-4 gap-0 text-center text-white text-md sm:text-2xl"
+        >
+          {
+            navLinks.map((link) => (
+              <a
+                href={link.href}
+                class={`p-2 m-2 sm:p-2 sm:m-4  ${
+                  currentPath === link.href
+                    ? "bg-zinc-700 text-zinc-950 font-semibold hover:bg-zinc-300"
+                    : "hover:text-zinc-950 hover:bg-zinc-300 hover:font-semibold"
+                }`}
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </div>
+      </SectionBorder>
+    </nav>
+  </div>
+</header>
+

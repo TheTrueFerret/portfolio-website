@@ -1,13 +1,13 @@
 ---
-import Navigation from '../components/Navigation.astro';
-import Footer from '../components/Footer.astro';
-import '../styles/global.css';
-import { SEO } from 'astro-seo';
+import Navigation from "../components/sections/Navigation.astro";
+import Footer from "../components/sections/Footer.astro";
+import "../styles/global.css";
+import { SEO } from "astro-seo";
 
-const { 
+const {
   pageTitle,
   description = "Jarno Fret's aka TrueFerret's Portfolio Website",
-  canonical
+  canonical,
 } = Astro.props;
 
 const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
@@ -15,11 +15,11 @@ const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<SEO
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <SEO
       title={pageTitle}
       description={description}
       canonical={canonicalURL.toString()}
@@ -59,11 +59,10 @@ const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
         ],
       }}
     />
-	</head>
-	<body class='text-zinc-100 bg-zinc-950'>
-		<Navigation />
-		<slot />
-		<Footer />
-	</body>
+  </head>
+  <body class="text-zinc-100 bg-zinc-950">
+    <Navigation />
+    <slot />
+    <Footer />
+  </body>
 </html>
-
