@@ -1,28 +1,14 @@
 ---
-import { Image } from "astro:assets";
-import profileImage from "../../assets/images/profile-image.jpg";
 import SectionBorder from "../universals/SectionBorder.astro";
 ---
 
 <section class="w-full pb-10">
-  <div class="relative flex flex-col sm:flex-row gap-4 max-w-6xl mx-auto px-4">
-    <div
-      class="sm:w-2/6 group relative border-2 border-zinc-700 hover:border-zinc-400"
-    >
-      <div
-        class="h-64 sm:h-full w-full font-medium sm:text-xl overflow-hidden"
-      >
-        <Image
-          src={profileImage}
-          alt="A picture of Jarno Fret"
-          class="w-full h-full object-cover block"
-        />
-      </div>
-    </div>
-    <div class="sm:w-4/6">
+  <div class="relative max-w-6xl mx-auto px-4">
+    <div>
       <SectionBorder sectionName="whoami">
         <div class="font-medium sm:text-xl p-4 sm:p-8">
           <h1
+           
             class="text-4xl sm:text-6xl md:text-7xl font-bold pb-4 sm:pb-8"
           >
             Who is TrueFerret?

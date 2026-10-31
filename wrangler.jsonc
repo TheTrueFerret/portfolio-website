@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "trueferret-portfolio",
+  "compatibility_date": "2026-10-19",
+  // Static-only Worker: Cloudflare serves the Astro build output directly
+  // from its edge, no Worker script (and no per-request billing) needed.
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Uncomment to attach the domain on deploy (remove it from any old
+  // Pages project / DNS record first):
+  // "routes": [{ "pattern": "trueferret.dev", "custom_domain": true }]
+}

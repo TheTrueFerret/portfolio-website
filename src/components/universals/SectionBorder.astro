@@ -2,11 +2,25 @@
 const { sectionName } = Astro.props;
 ---
 
-<div class="h-full group relative border-2 border-zinc-700 hover:border-zinc-400">
+<div class="h-full group relative bg-zinc-950 border-2 border-zinc-700 hover:border-zinc-400">
   <span
-    class="absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300"
+    class="section-label absolute -top-4 left-6 px-2 bg-neutral-950 text-zinc-500 text-md font-semibold group-hover:text-zinc-300"
   >
     {sectionName}
   </span>
   <slot />
 </div>
+
+<style>
+  /* Terminal-style caret that blinks after the label on hover */
+  .section-label::after {
+    content: "_";
+    display: inline-block;
+    width: 0;
+    opacity: 0;
+  }
+  .group:hover > .section-label::after {
+    width: auto;
+    animation: caret-blink 1s step-end infinite;
+  }
+</style>

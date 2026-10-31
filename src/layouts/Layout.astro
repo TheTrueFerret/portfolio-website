@@ -1,6 +1,7 @@
 ---
 import Navigation from "../components/sections/Navigation.astro";
 import Footer from "../components/sections/Footer.astro";
+import AsciiBackground from "../components/universals/AsciiBackground.astro";
 import "../styles/global.css";
 import { SEO } from "astro-seo";
 
@@ -61,6 +62,7 @@ const canonicalURL = canonical || new URL(Astro.url.pathname, Astro.site);
     />
   </head>
   <body class="text-zinc-100 bg-zinc-950">
+    <AsciiBackground />
     <Navigation />
     <slot />
     <Footer />

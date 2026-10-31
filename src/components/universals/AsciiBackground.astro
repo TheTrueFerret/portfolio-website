@@ -1,0 +1,285 @@
+---
+// Full-page ASCII "topographic map" that sits behind every page.
+// Contour lines are drawn with the same / \ | _ - glyphs as the hero's
+// figlet lettering, slowly morph over time, drift with scroll (parallax)
+// and light up around the cursor.
+---
+
+<canvas
+  id="ascii-background"
+  aria-hidden="true"
+  class="fixed inset-0 -z-10 w-full h-full pointer-events-none"
+></canvas>
+
+<style>
+  #ascii-background {
+    /* Keep the centre column (where the content lives) calmer than the edges */
+    mask-image: radial-gradient(
+      ellipse 70% 80% at 50% 45%,
+      rgb(0 0 0 / 0.45) 0%,
+      rgb(0 0 0 / 1) 100%
+    );
+  }
+</style>
+
+<script>
+  const FONT_SIZE = 13;
+  const LINE_HEIGHT = 15;
+  const NOISE_SCALE = 0.0021; // terrain "zoom", in noise units per pixel
+  const LEVELS = 7; // contour lines across the full noise range
+  const INDEX_EVERY = 5; // every Nth contour is drawn brighter, like a real topo map
+  const PARALLAX = 0.35; // terrain scrolls at this fraction of the page speed
+  const TIME_SPEED = 0.000028; // noise z-axis units per ms
+  const DRIFT_SPEED = 0.006; // px per ms of sideways drift
+  const GRID_COLS = 14;
+  const GRID_ROWS = 7;
+  const GLOW_RADIUS = 220;
+  const FRAME_MS = 1000 / 30;
+  const ALPHA_STEPS = 16;
+  const RGB = "161 161 170"; // zinc-400
+
+  // --- Improved Perlin noise (Ken Perlin, 2002) -------------------------
+  const perm = new Uint8Array(512);
+  {
+    const p = Array.from({ length: 256 }, (_, i) => i);
+    for (let i = 255; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [p[i], p[j]] = [p[j], p[i]];
+    }
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
+  }
+
+  const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+  const lerp = (a: number, b: number, t: number) => a + t * (b - a);
+
+  function grad(hash: number, x: number, y: number, z: number) {
+    const h = hash & 15;
+    const u = h < 8 ? x : y;
+    const v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+    return (h & 1 ? -u : u) + (h & 2 ? -v : v);
+  }
+
+  function noise(x: number, y: number, z: number) {
+    const X = Math.floor(x) & 255;
+    const Y = Math.floor(y) & 255;
+    const Z = Math.floor(z) & 255;
+    x -= Math.floor(x);
+    y -= Math.floor(y);
+    z -= Math.floor(z);
+    const u = fade(x);
+    const v = fade(y);
+    const w = fade(z);
+    const A = perm[X] + Y;
+    const AA = perm[A] + Z;
+    const AB = perm[A + 1] + Z;
+    const B = perm[X + 1] + Y;
+    const BA = perm[B] + Z;
+    const BB = perm[B + 1] + Z;
+    return lerp(
+      lerp(
+        lerp(grad(perm[AA], x, y, z), grad(perm[BA], x - 1, y, z), u),
+        lerp(grad(perm[AB], x, y - 1, z), grad(perm[BB], x - 1, y - 1, z), u),
+        v,
+      ),
+      lerp(
+        lerp(grad(perm[AA + 1], x, y, z - 1), grad(perm[BA + 1], x - 1, y, z - 1), u),
+        lerp(grad(perm[AB + 1], x, y - 1, z - 1), grad(perm[BB + 1], x - 1, y - 1, z - 1), u),
+        v,
+      ),
+      w,
+    );
+  }
+
+  const terrain = (x: number, y: number, z: number) =>
+    (noise(x, y, z) + 0.45 * noise(x * 2.1, y * 2.1, z * 1.4 + 7.3)) / 1.45;
+
+  // --- Rendering ---------------------------------------------------------
+  const canvas = document.getElementById("ascii-background") as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext("2d");
+
+  if (canvas && ctx) {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let width = 0;
+    let height = 0;
+    let cellW = 0;
+    let cols = 0;
+    let rows = 0;
+    let values = new Float32Array(0);
+
+    const pointer = { x: -9999, y: -9999 };
+    const glow = { x: -9999, y: -9999, strength: 0 };
+    let pointerActive = false;
+
+    // One bucket of glyph positions per alpha step, so each frame only
+    // switches fillStyle ALPHA_STEPS times instead of once per glyph.
+    const buckets: { chars: string[]; xs: number[]; ys: number[] }[] = Array.from(
+      { length: ALPHA_STEPS },
+      () => ({ chars: [], xs: [], ys: [] }),
+    );
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas!.width = Math.round(width * dpr);
+      canvas!.height = Math.round(height * dpr);
+      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx!.font = `${FONT_SIZE}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      ctx!.textBaseline = "top";
+      cellW = ctx!.measureText("M").width;
+      cols = Math.ceil(width / cellW) + 2;
+      rows = Math.ceil(height / LINE_HEIGHT) + 2;
+      values = new Float32Array(cols * rows);
+    }
+
+    function draw(elapsed: number) {
+      const scrollOffset = reducedMotion.matches ? 0 : window.scrollY * PARALLAX;
+      const z = elapsed * TIME_SPEED;
+      const drift = elapsed * DRIFT_SPEED;
+
+      // Sample the terrain one cell outside the viewport on every side so
+      // the finite-difference gradient below is defined for every visible cell.
+      for (let r = 0; r < rows; r++) {
+        const py = ((r - 1) * LINE_HEIGHT + scrollOffset) * NOISE_SCALE;
+        for (let c = 0; c < cols; c++) {
+          const px = ((c - 1) * cellW + drift) * NOISE_SCALE;
+          values[r * cols + c] = terrain(px, py, z) * LEVELS;
+        }
+      }
+
+      for (const b of buckets) {
+        b.chars.length = 0;
+        b.xs.length = 0;
+        b.ys.length = 0;
+      }
+
+      const gridRowShift = Math.floor(scrollOffset / LINE_HEIGHT);
+      const glowR2 = GLOW_RADIUS * GLOW_RADIUS;
+
+      for (let r = 1; r < rows - 1; r++) {
+        const y = (r - 1) * LINE_HEIGHT;
+        for (let c = 1; c < cols - 1; c++) {
+          const x = (c - 1) * cellW;
+          const i = r * cols + c;
+          const v = values[i];
+
+          let light = 0;
+          if (glow.strength > 0.01) {
+            const dx = x + cellW / 2 - glow.x;
+            const dy = y + LINE_HEIGHT / 2 - glow.y;
+            light = Math.exp(-(dx * dx + dy * dy) / glowR2) * glow.strength;
+          }
+
+          // Gradient in level units per pixel.
+          const gx = (values[i + 1] - values[i - 1]) / (2 * cellW);
+          const gy = (values[i + cols] - values[i - cols]) / (2 * LINE_HEIGHT);
+          const ax = Math.abs(gx);
+          const ay = Math.abs(gy);
+          const g = Math.hypot(gx, gy);
+
+          const level = Math.round(v);
+          const pixelDist = Math.abs(level - v) / (g || 1e-9);
+          // Allow roughly half a cell of thickness, measured across the line.
+          const threshold = (0.45 * (ax * cellW + ay * LINE_HEIGHT)) / (ax + ay || 1);
+
+          let char = "";
+          let alpha = 0;
+
+          if (pixelDist < threshold) {
+            if (ay > ax * 2.2) {
+              // Horizontal contour; sit "_" low when the line passes below centre.
+              const offsetY = (((level - v) / g) * gy) / g;
+              char = offsetY > LINE_HEIGHT * 0.12 ? "_" : "-";
+            } else if (ax > ay * 2.2) {
+              char = "|";
+            } else {
+              char = gx * gy > 0 ? "/" : "\\";
+            }
+            const isIndex = ((level % INDEX_EVERY) + INDEX_EVERY) % INDEX_EVERY === 0;
+            alpha = (isIndex ? 0.3 : 0.15) + light * 0.85;
+          } else if (
+            c % GRID_COLS === 0 &&
+            (((r + gridRowShift) % GRID_ROWS) + GRID_ROWS) % GRID_ROWS === 0
+          ) {
+            char = "+";
+            alpha = 0.1 + light * 0.3;
+          } else if (light > 0.12 && (c + r) % 2 === 0) {
+            char = v - Math.floor(v) > 0.5 ? ":" : ".";
+            alpha = light * 0.3;
+          }
+
+          if (!char) continue;
+          const step = Math.min(ALPHA_STEPS - 1, Math.floor(alpha * ALPHA_STEPS));
+          if (step <= 0) continue;
+          const bucket = buckets[step];
+          bucket.chars.push(char);
+          bucket.xs.push(x);
+          bucket.ys.push(y);
+        }
+      }
+
+      ctx!.clearRect(0, 0, width, height);
+      for (let s = 1; s < ALPHA_STEPS; s++) {
+        const b = buckets[s];
+        if (!b.chars.length) continue;
+        ctx!.fillStyle = `rgb(${RGB} / ${(s / ALPHA_STEPS).toFixed(3)})`;
+        for (let k = 0; k < b.chars.length; k++) ctx!.fillText(b.chars[k], b.xs[k], b.ys[k]);
+      }
+    }
+
+    const start = performance.now();
+    let lastFrame = -Infinity;
+
+    function updateGlow(snap: boolean) {
+      const target = pointerActive ? 1 : 0;
+      const t = snap ? 1 : 0.12;
+      glow.x = glow.x < -999 || snap ? pointer.x : lerp(glow.x, pointer.x, t);
+      glow.y = glow.y < -999 || snap ? pointer.y : lerp(glow.y, pointer.y, t);
+      glow.strength = lerp(glow.strength, target, snap ? 1 : 0.08);
+    }
+
+    function loop(now: number) {
+      requestAnimationFrame(loop);
+      if (now - lastFrame < FRAME_MS) return;
+      lastFrame = now;
+      updateGlow(false);
+      draw(now - start);
+    }
+
+    // With reduced motion the terrain is frozen; only redraw on input.
+    const renderStill = () => {
+      updateGlow(true);
+      draw(0);
+    };
+
+    resize();
+
+    window.addEventListener("resize", () => {
+      resize();
+      if (reducedMotion.matches) renderStill();
+    });
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        pointer.x = event.clientX;
+        pointer.y = event.clientY;
+        pointerActive = event.pointerType === "mouse";
+        if (reducedMotion.matches) renderStill();
+      },
+      { passive: true },
+    );
+
+    document.documentElement.addEventListener("pointerleave", () => {
+      pointerActive = false;
+      if (reducedMotion.matches) renderStill();
+    });
+
+    if (reducedMotion.matches) {
+      renderStill();
+    } else {
+      requestAnimationFrame(loop);
+    }
+  }
+</script>

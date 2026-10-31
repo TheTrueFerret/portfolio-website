@@ -16,7 +16,7 @@ const { item, imageSrc } = Astro.props;
 ---
 
 <div class="w-full flex flex-row justify-center my-8">
-  <div class="w-full group flex flex-row items-center gap-4 max-w-4xl">
+  <div data-prompt-host class="w-full group/item flex flex-row items-center gap-4 max-w-4xl">
     {
       imageSrc && (
         <div class="flex-shrink-0">
@@ -25,16 +25,16 @@ const { item, imageSrc } = Astro.props;
             alt={item.company}
             width={128}
             height={128}
-            class="w-20 sm:w-24 md:w-32 h-auto"
+            class="w-20 sm:w-24 md:w-32 h-auto transition-transform duration-150 ease-out group-hover/item:scale-105"
           />
         </div>
       )
     }
     <div
-      class="border-l-2 border-zinc-600 pl-4 flex-1 group-hover:border-zinc-400"
+      class="border-l-2 border-zinc-600 pl-4 flex-1 group-hover/item:border-zinc-300"
     >
       <div class="my-4">
-        <h3 class="text-lg sm:text-2xl font-bold text-zinc-100">
+        <h3 class="prompt-target text-lg sm:text-2xl font-bold text-zinc-100">
           {item.title}
         </h3>
         <p class="text-sm sm:text-lg text-zinc-400">{item.company}</p>

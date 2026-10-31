@@ -45,7 +45,7 @@ const getImageSrc = async (imagePath: string) => {
     </div>
 
     <div
-      class="group relative flex flex-col justify-center p-4 border-2 border-zinc-700 hover:border-zinc-300"
+      class="group relative flex flex-col justify-center p-4 bg-zinc-950 border-2 border-zinc-700 hover:border-zinc-300"
     >
       <span
         id="timeline-title"
@@ -88,6 +88,26 @@ const getImageSrc = async (imagePath: string) => {
     title.textContent = text;
   }
 
+  // Print the timeline items in one by one, terminal style, when switching tabs
+  function playEntrance(content: HTMLElement | null) {
+    if (!content) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    Array.from(content.children).forEach((child, i) => {
+      (child as HTMLElement).animate(
+        [
+          { clipPath: "inset(0 0 100% 0)", opacity: 0.4 },
+          { clipPath: "inset(0 0 0 0)", opacity: 1 },
+        ],
+        {
+          duration: 320,
+          delay: i * 90,
+          easing: "steps(5, end)",
+          fill: "backwards",
+        },
+      );
+    });
+  }
+
   function showWork() {
     workTab?.classList.remove(
       "border-zinc-700",
@@ -119,6 +139,7 @@ const getImageSrc = async (imagePath: string) => {
     educationContent?.style.setProperty("display", "none");
 
     setTitle("work-experience");
+    playEntrance(workContent);
   }
 
   function showEducation() {
@@ -152,6 +173,7 @@ const getImageSrc = async (imagePath: string) => {
     workContent?.style.setProperty("display", "none");
 
     setTitle("education");
+    playEntrance(educationContent);
   }
 
   workTab?.addEventListener("click", showWork);

@@ -2,25 +2,37 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import BlogItem from "../components/BlogItem.astro";
-import ComingSoon from "../components/ComingSoon.astro";
+import SectionBorder from "../components/universals/SectionBorder.astro";
 
 const pageTitle = "Blog - TrueFerret.dev";
+const description = "Opinions, thoughts, tech and media.";
 const posts = await getCollection("blog");
 
 // Sort newest first
 posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
-<Layout pageTitle={pageTitle}>
-  <ComingSoon />
-  {/*
+<Layout pageTitle={pageTitle} description={description}>
   <section class="w-full py-10">
-    <div class="max-w-4xl mx-auto px-4">
-      <div class="flex flex-col gap-6">
-        {posts.map((post) => <BlogItem post={post} />)}
-      </div>
+    <div class="max-w-4xl mx-auto px-4 flex flex-col gap-10">
+      <SectionBorder sectionName="blog">
+        <div class="p-6 sm:p-10">
+          <h1 class="text-4xl sm:text-6xl font-bold pb-4">Blog</h1>
+          <p class="font-medium sm:text-xl text-zinc-300">{description}</p>
+        </div>
+      </SectionBorder>
+
+      {
+        posts.length > 0 ? (
+          <div class="flex flex-col gap-6">
+            {posts.map((post) => (
+              <BlogItem post={post} />
+            ))}
+          </div>
+        ) : (
+          <p class="text-center text-zinc-400">No posts yet, stay tuned!</p>
+        )
+      }
     </div>
   </section>
-  */}
-  
 </Layout>

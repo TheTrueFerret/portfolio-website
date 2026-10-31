@@ -1,11 +1,20 @@
 [
   {
+    "company": "Schneider Electric",
+    "image": "/assets/images/schneider-electric-logo.png",
+    "title": "Application Engineer",
+    "date": "January 2026 - Present",
+    "description": "",
+    "order": 1,
+    "isWork": true
+  },
+  {
     "company": "InfoSupport",
     "image": "/assets/images/info-support-logo.png",
     "title": "Internship",
     "date": "April 2025 - June 2025",
     "description": "Built InfoQuest, an app that helps coworkers give compliments and collect digital cards. Made the backend with Kotlin, Spring Boot, and Spring Modulith, using PostgreSQL for the database. Created a mobile app that works on different phones using Kotlin Multiplatform and built a website with React. Added NFC features so users can interact by touching phones together and used AI to create card images. Worked in a team of 2 and learned from experienced developers. If you are a student reading this, I really recommend doing your internship at Info Support!",
-    "order": 1,
+    "order": 2,
     "isWork": true
   },
   {
@@ -14,7 +23,7 @@
     "title": "Video Editor / Producer / Content Creator",
     "date": "December 2021 - February 2023",
     "description": "",
-    "order": 2,
+    "order": 3,
     "isWork": true
   },
   {
@@ -23,7 +32,7 @@
     "title": "Warehouse Employee",
     "date": "Summer 2018 - Summer 2019",
     "description": "",
-    "order": 3,
+    "order": 4,
     "isWork": true
   }
 ]

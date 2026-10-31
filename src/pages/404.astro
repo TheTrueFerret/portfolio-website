@@ -1,0 +1,37 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SectionBorder from "../components/universals/SectionBorder.astro";
+
+const pageTitle = "404 - TrueFerret.dev";
+---
+
+<Layout pageTitle={pageTitle}>
+  <section class="w-full py-24 sm:py-32">
+    <div class="relative max-w-6xl mx-auto px-4">
+      <SectionBorder sectionName="404">
+        <div class="flex flex-col items-center gap-8 p-10 sm:p-16 text-center">
+          <pre
+            aria-hidden="true"
+            class="font-mono text-xl sm:text-4xl md:text-5xl leading-none tracking-tighter text-zinc-700 select-none whitespace-pre">
+   __ __  ____  __ __
+  / // / / __ \/ // /
+ / // /_/ / / / // /_
+/__  __/ /_/ /__  __/
+  /_/  \____/  /_/   </pre>
+          <h1 class="text-3xl sm:text-5xl font-bold">Off the map.</h1>
+          <p class="max-w-xl text-zinc-400 sm:text-xl">
+            This page doesn't exist (anymore). The contour lines out here don't
+            lead anywhere either.
+          </p>
+          <a
+            href="/"
+            class="inline-flex items-center px-8 py-4 border-2 border-zinc-700 bg-zinc-950 hover:border-zinc-200
+                   hover:bg-zinc-200 active:bg-zinc-700 text-white hover:text-zinc-950 font-semibold"
+          >
+            cd ~
+          </a>
+        </div>
+      </SectionBorder>
+    </div>
+  </section>
+</Layout>
