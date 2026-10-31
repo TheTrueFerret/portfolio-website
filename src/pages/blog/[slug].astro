@@ -15,10 +15,18 @@ const { Content } = await render(post);
 ---
 
 <Layout pageTitle={`${post.data.title} | TrueFerret.dev`}>
+  <!-- Reading progress bar -->
+  <div
+    aria-hidden="true"
+    class="reading-progress fixed top-0 left-0 z-50 h-1.5 w-full"
+    style="clip-path: inset(0 100% 0 0)"
+    id="reading-progress"
+  ></div>
+
   <section class="w-full py-10">
     <div class="max-w-4xl mx-auto px-4">
       <article
-        class="md:pl-24 flex flex-col justify-center p-4 border-2 border-zinc-700 hover:border-zinc-300"
+        class="flex flex-col justify-center p-6 sm:p-10 bg-zinc-950 border-2 border-zinc-700 hover:border-zinc-300 transition-colors duration-300"
       >
         {
           post.data.image && (
@@ -33,8 +41,54 @@ const { Content } = await render(post);
         <p class="text-sm text-zinc-400 mb-6">
           {post.data.pubDate.toLocaleDateString()}
         </p>
-        <Content />
+        <div
+          class="prose prose-invert prose-zinc max-w-none prose-a:text-zinc-100 prose-a:underline-offset-4 hover:prose-a:text-white prose-pre:border-2 prose-pre:border-zinc-800 prose-pre:rounded-none prose-code:before:content-none prose-code:after:content-none"
+        >
+          <Content />
+        </div>
+
+        <div class="mt-12 pt-8 border-t-2 border-zinc-800 flex justify-center">
+          <a
+            href="/blog/"
+            data-prompt-host
+            class="prompt-target inline-flex items-center gap-2 px-8 py-4 border-2 border-zinc-700 bg-zinc-950 text-white font-semibold hover:border-zinc-200 hover:bg-zinc-200 hover:text-zinc-950"
+          >
+            Read more articles
+          </a>
+        </div>
       </article>
     </div>
   </section>
 </Layout>
+
+<script>
+  const bar = document.getElementById("reading-progress");
+  const article = document.querySelector("article");
+
+  function updateProgress() {
+    if (!bar || !article) return;
+    const rect = article.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    const progress = total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 1;
+    // Snap to whole blocks so it fills like a terminal progress bar
+    // (keep in sync with the 20 blocks in the style below)
+    const blocks = 20;
+    const filled = Math.floor(progress * blocks) / blocks;
+    bar.style.clipPath = `inset(0 ${100 - filled * 100}% 0 0)`;
+  }
+
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+</script>
+
+<style>
+  .reading-progress {
+    /* Row of separate blocks: ████████ */
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-zinc-200) 0 calc(100% / 20 - 4px),
+      transparent calc(100% / 20 - 4px) calc(100% / 20)
+    );
+  }
+</style>

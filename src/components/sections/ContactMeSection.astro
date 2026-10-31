@@ -1,62 +1,122 @@
 ---
 import { Icon } from "astro-icon/components";
+import SectionBorder from "../universals/SectionBorder.astro";
+
+const channels = [
+  {
+    id: "instagram",
+    name: "Instagram",
+    icon: "simple-icons:instagram",
+    handle: "@trueferret",
+    href: "https://instagram.com/trueferret",
+    command: "open instagram.com/trueferret",
+    description: "Quick questions, collabs or just saying hi.",
+  },
+  {
+    id: "linkedin",
+    name: "LinkedIn",
+    icon: "simple-icons:linkedin",
+    handle: "in/jarno-fret",
+    href: "https://linkedin.com/in/jarno-fret",
+    command: "open linkedin.com/in/jarno-fret",
+    description: "Work, opportunities and everything professional.",
+  },
+];
 ---
 
-<section class="w-full py-12">
-  <div class="max-w-5xl mx-auto sm:px-4">
-    <div
-      class="flex flex-col items-center gap-8 text-center text-white font-medium
-             sm:text-xl p-6 sm:p-10"
-    >
-      <h2 class="text-2xl sm:text-4xl md:text-5xl font-bold">
-        DM Me on Instagram or LinkedIn
-      </h2>
+<section class="w-full py-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <SectionBorder sectionName="contact">
+      <div class="p-6 sm:p-10">
+        <h1 class="text-4xl sm:text-6xl font-bold pb-4">Send me a DM</h1>
+        <p class="font-medium sm:text-xl text-zinc-400 max-w-2xl pb-8 sm:pb-10">
+          Prefer a quick message? I'm on both platforms. Drop a DM and I'll get
+          back to you.
+        </p>
 
-      <p class="max-w-2xl text-zinc-400">
-        Prefer a quick message? I'm available on both platforms — drop a DM and
-        I'll get back to you.
-      </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {
+            channels.map((channel) => (
+              <a
+                href={channel.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`DM me on ${channel.name} (opens in a new tab)`}
+                data-cta-host
+                class={`contact-card contact-${channel.id} flex flex-col bg-zinc-950 border-2 border-zinc-700`}
+              >
+                <!-- Terminal-style title bar -->
+                <div class="contact-bar flex items-center gap-2 px-4 py-2 border-b-2 border-zinc-800 font-mono text-xs sm:text-sm text-zinc-500 overflow-hidden whitespace-nowrap">
+                  <span class="text-zinc-600">~ $</span>
+                  <span class="truncate">{channel.command}</span>
+                  <span class="contact-caret term-caret" aria-hidden="true" />
+                </div>
 
-      <div
-        class="w-full grid grid-cols-2 gap-6 sm:gap-8 justify-items-center
-               items-start md:max-w-3xl"
-      >
-        <a
-          href="https://instagram.com/trueferret"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open my Instagram in a new tab"
-          title="Instagram — opens in a new tab"
-          class="group focus:outline-none focus-visible:ring-3 focus-visible:ring-offset-2 
-                p-4 w-44 h-44 flex flex-col items-center justify-center"
-        >
-          <div
-            class="text-zinc-500 group-hover:text-zinc-100 **:-mt-1"
-            aria-hidden="true"
-          >
-            <Icon name="line-md:instagram" size={160} />
-          </div>
-          <span class="mt-3 text-sm text-zinc-300 font-semibold">Instagram</span>
-        </a>
+                <div class="flex items-center gap-5 sm:gap-6 p-6">
+                  <div class="contact-tile flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center bg-zinc-900 text-zinc-400">
+                    <Icon name={channel.icon} size={44} />
+                  </div>
+                  <div class="min-w-0">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-zinc-100">
+                      {channel.name}
+                    </h2>
+                    <p class="font-mono text-zinc-400 mb-2">{channel.handle}</p>
+                    <p class="text-zinc-400">{channel.description}</p>
+                  </div>
+                </div>
 
-        <a
-          href="https://linkedin.com/in/jarno-fret"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open my LinkedIn in a new tab"
-          title="LinkedIn — opens in a new tab"
-          class="group focus:outline-none focus-visible:ring-3 focus-visible:ring-offset-2
-                 p-4 w-44 h-44 flex flex-col items-center justify-center"
-        >
-          <div
-            class="text-zinc-500 hover:text-zinc-100 -mt-1"
-            aria-hidden="true"
-          >
-            <Icon name="line-md:linkedin" size={160} />
-          </div>
-          <span class="mt-3 text-sm text-zinc-300">LinkedIn</span>
-        </a>
+                <div class="mt-auto flex justify-end px-6 pb-5">
+                  <span class="term-cta text-sm font-semibold text-zinc-500">
+                    send a DM <span class="blink-on-hover">&#x2197;&#xFE0E;</span>
+                  </span>
+                </div>
+              </a>
+            ))
+          }
+        </div>
       </div>
-    </div>
+    </SectionBorder>
   </div>
 </section>
+
+<style>
+  /* Instant, terminal-style hover: everything switches at once */
+  .contact-card:hover {
+    border-color: var(--accent);
+  }
+  .contact-card:hover .contact-bar {
+    color: var(--color-zinc-300);
+  }
+  .contact-card:hover .contact-tile {
+    background: var(--tile-bg);
+    color: #fff;
+  }
+
+  /* The cursor in the title bar only shows while hovering */
+  .contact-caret {
+    visibility: hidden;
+  }
+  .contact-card:hover .contact-caret {
+    visibility: visible;
+  }
+
+  .contact-card {
+    --cta-bg: var(--accent);
+    --cta-fg: #fff;
+  }
+  .contact-instagram {
+    --accent: #d62976;
+    --tile-bg: linear-gradient(
+      45deg,
+      #feda75 0%,
+      #fa7e1e 25%,
+      #d62976 50%,
+      #962fbf 75%,
+      #4f5bd5 100%
+    );
+  }
+  .contact-linkedin {
+    --accent: #0a66c2;
+    --tile-bg: #0a66c2;
+  }
+</style>

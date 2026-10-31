@@ -1,0 +1,192 @@
+---
+import { Image } from "astro:assets";
+import SectionBorder from "../universals/SectionBorder.astro";
+import ferretMediaLogo from "../../assets/images/companies/ferret-media.svg";
+
+// Drop a screenshot in src/assets/images/companies/ named <id>-screenshot.(png|jpg|webp)
+// (e.g. linker-screenshot.png) and it replaces the logo in that card's banner.
+const screenshots = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/images/companies/*-screenshot.{png,jpg,jpeg,webp}",
+  { eager: true },
+);
+const getScreenshot = (id: string) =>
+  Object.entries(screenshots).find(([path]) =>
+    path.split("/").pop()!.startsWith(`${id}-screenshot.`),
+  )?.[1].default;
+
+const companies = [
+  {
+    id: "ferret",
+    name: "Ferret Media",
+    href: "https://ferret.media",
+    domain: "ferret.media",
+    tags: ["Content agency", "Antwerp"],
+    tagline: "Creative social-first content.",
+    description:
+      "A social media content agency for brands, creators and events. Strategy, filming and editing, all in-house.",
+  },
+  {
+    id: "linker",
+    name: "Linker",
+    href: "https://linker.cool",
+    domain: "linker.cool",
+    tags: ["atproto", "Beta"],
+    tagline: "A link in bio you actually own.",
+    description:
+      "Your links live in your own Bluesky repository, not in our database. Built by Ferret Media.",
+  },
+  {
+    id: "lull",
+    name: "lull",
+    href: "https://lull.software",
+    domain: "lull.software",
+    tags: ["Software", "Coming soon"],
+    tagline: "Something calm is coming.",
+    description: "Software by lull.",
+  },
+];
+---
+
+<section class="w-full pb-10">
+  <div class="max-w-6xl mx-auto px-4">
+    <SectionBorder sectionName="companies">
+      <div class="p-4 sm:p-8">
+        <h2 class="text-3xl sm:text-5xl font-bold pb-2">My Companies</h2>
+        <p class="text-zinc-400 sm:text-lg pb-6 sm:pb-8">
+          Things I'm building next to my day job.
+        </p>
+        <ul class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {
+            companies.map((company) => (
+              <li>
+                <a
+                  href={company.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cta-host
+                  class={`company-card company-${company.id} h-full flex flex-col bg-zinc-950 border-2 border-zinc-700`}
+                >
+                  <div class="company-stage relative h-44 overflow-hidden flex items-center justify-center bg-zinc-900/60">
+                    {getScreenshot(company.id) ? (
+                      <Image
+                        src={getScreenshot(company.id)!}
+                        alt={`Screenshot of ${company.name}`}
+                        width={720}
+                        class="company-logo absolute inset-0 w-full h-full object-cover object-top"
+                      />
+                    ) : (
+                    <div class="company-logo relative">
+                      {company.id === "ferret" && (
+                        <Image
+                          src={ferretMediaLogo}
+                          alt="Ferret Media logo"
+                          width={140}
+                          height={140}
+                          class="w-32 h-32"
+                        />
+                      )}
+                      {company.id === "linker" && (
+                        <div class="flex items-center gap-3">
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            aria-hidden="true"
+                            class="w-12 h-12"
+                          >
+                            <path
+                              d="m15.6 7-6.4 6.5a1.5 1.5 0 0 0 2.1 2.1l6.4-6.5a3 3 0 1 0-4.2-4.3l-6.4 6.5a4.5 4.5 0 1 0 6.4 6.4l6.3-6.4"
+                              stroke="#fafafa"
+                              stroke-width="1.9"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                          <span class="text-4xl font-bold text-white">
+                            Linker
+                          </span>
+                        </div>
+                      )}
+                      {company.id === "lull" && (
+                        <span class="lull-wordmark text-6xl font-bold text-white">
+                          lull
+                        </span>
+                      )}
+                    </div>
+                    )}
+                  </div>
+
+                  <div class="flex flex-col flex-grow p-6 border-t-2 border-zinc-800">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                      {company.tags.map((tag) => (
+                        <span class="company-tag text-xs px-2 py-1 border">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-zinc-100 mb-2">
+                      {company.tagline}
+                    </h3>
+                    <p class="text-zinc-400 leading-relaxed flex-grow">
+                      {company.description}
+                    </p>
+                    <div class="mt-6 flex items-center justify-between text-sm font-semibold">
+                      <span class="text-zinc-500">{company.domain}</span>
+                      <span class="term-cta text-zinc-500">visit <span class="blink-on-hover">&#x2197;&#xFE0E;</span></span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </SectionBorder>
+  </div>
+</section>
+
+<style>
+  /* Terminal feel: colours switch instantly, movement happens in hard steps */
+  .company-card {
+    transition: transform 150ms steps(2, end);
+  }
+  .company-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+
+  .company-logo {
+    transition: transform 150ms ease-out;
+  }
+  .company-card:hover .company-logo {
+    transform: scale(1.04);
+  }
+
+  .company-tag {
+    color: var(--color-zinc-400);
+    border-color: var(--color-zinc-700);
+  }
+  .company-card:hover .company-tag {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Hover colour per brand; the "visit" link becomes a selection in that colour */
+  .company-card {
+    --cta-bg: var(--accent);
+    --cta-fg: #fafafa;
+  }
+  .company-ferret {
+    --accent: #4545e6;
+  }
+  .company-linker {
+    --accent: #a855f7;
+  }
+  .company-lull {
+    --accent: #fafafa;
+    --cta-fg: #09090b;
+  }
+
+  .lull-wordmark {
+    letter-spacing: -0.04em;
+  }
+</style>

@@ -104,8 +104,8 @@
     /* Fallback/initial background when glow is inactive */
     background-image: linear-gradient(
       to right,
-      rgb(39 39 42),
-      rgb(39 39 42)
+      rgb(63 63 70),
+      rgb(63 63 70)
     );
   }
 
@@ -114,7 +114,7 @@
       circle var(--glow-size) at var(--mouse-x) var(--mouse-y),
       rgba(255, 255, 255, 0.8) 0%,
       rgba(255, 255, 255, 0.5) 20%,
-      rgba(39, 39, 42, 1) 70%
+      rgba(63, 63, 70, 1) 70%
     );
   }
 </style>

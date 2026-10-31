@@ -17,8 +17,12 @@ const otherWebsites = [
     text: "Ferret Media",
   },
   {
-    href: "https://lull-app.com",
-    text: "lull app",
+    href: "https://linker.cool",
+    text: "Linker",
+  },
+  {
+    href: "https://lull.software",
+    text: "lull",
   },
 ];
 ---
@@ -40,7 +44,8 @@ const otherWebsites = [
                   <li>
                     <a
                       href={link.href}
-                      class="text-zinc-400 hover:text-zinc-100 text-md"
+                      data-prompt-host
+                      class="prompt-target text-zinc-400 hover:text-zinc-100 text-md"
                     >
                       {link.text}
                     </a>
@@ -62,7 +67,8 @@ const otherWebsites = [
                       href={site.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-zinc-400 hover:text-zinc-100 text-md"
+                      data-prompt-host
+                      class="prompt-target text-zinc-400 hover:text-zinc-100 text-md"
                     >
                       {site.text}
                       <span
@@ -88,7 +94,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="GitHub"
               >
                 <Icon name="line-md:github-loop" size={48} />
@@ -99,7 +105,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="YouTube"
               >
                 <Icon name="line-md:youtube-filled" size={48} />
@@ -110,7 +116,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter/X"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="Twitter/X"
               >
                 <Icon name="line-md:twitter-filled" size={48} />
@@ -121,7 +127,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Spotify"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="Spotify"
               >
                 <Icon name="line-md:spotify" size={48} />
@@ -132,7 +138,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="TikTok"
               >
                 <Icon name="line-md:tiktok" size={48} />
@@ -143,7 +149,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Bluesky"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="Bluesky"
               >
                 <Icon name="line-md:bluesky" size={48} />
@@ -154,7 +160,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="Instagram"
               >
                 <Icon name="line-md:instagram" size={48} />
@@ -165,7 +171,7 @@ const otherWebsites = [
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12"
+                class="text-zinc-500 hover:text-zinc-100 block w-12 h-12 hover:-translate-y-1"
                 title="LinkedIn"
               >
                 <Icon name="line-md:linkedin" size={48} />
