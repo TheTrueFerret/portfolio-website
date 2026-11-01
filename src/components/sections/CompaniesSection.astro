@@ -1,6 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import SectionBorder from "../universals/SectionBorder.astro";
+import BannerBlobs from "../BannerBlobs.astro";
 import ferretMediaLogo from "../../assets/images/companies/ferret-media.svg";
 
 // Drop a screenshot in src/assets/images/companies/ named <id>-screenshot.(png|jpg|webp)
@@ -22,6 +23,7 @@ const companies = [
     domain: "ferret.media",
     tags: ["Content agency", "Antwerp"],
     tagline: "Creative social-first content.",
+    blobs: ["#4545e6", "#9f1d8e"] as [string, string],
     description:
       "A social media content agency for brands, creators and events. Strategy, filming and editing, all in-house.",
   },
@@ -32,6 +34,7 @@ const companies = [
     domain: "linker.cool",
     tags: ["atproto", "Beta"],
     tagline: "A link in bio you actually own.",
+    blobs: ["#4545e6", "#9f1d8e"] as [string, string],
     description:
       "Your links live in your own Bluesky repository, not in our database. Built by Ferret Media.",
   },
@@ -42,6 +45,7 @@ const companies = [
     domain: "lull.software",
     tags: ["Software", "Coming soon"],
     tagline: "Something calm is coming.",
+    blobs: undefined,
     description: "Software by lull.",
   },
 ];
@@ -66,7 +70,10 @@ const companies = [
                   data-cta-host
                   class={`company-card company-${company.id} h-full flex flex-col bg-zinc-950 border-2 border-zinc-700`}
                 >
-                  <div class="company-stage relative h-44 overflow-hidden flex items-center justify-center bg-zinc-900/60">
+                  <div class="company-stage relative isolate h-44 overflow-hidden flex items-center justify-center bg-zinc-900/60">
+                    {company.blobs && (
+                      <BannerBlobs seed={company.id} colors={company.blobs} />
+                    )}
                     {getScreenshot(company.id) ? (
                       <Image
                         src={getScreenshot(company.id)!}
