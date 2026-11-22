@@ -2,9 +2,9 @@
 // Full-page "sea of data" that sits behind every page.
 // Swells of bits and hex follow the contours of a big, slowly morphing noise
 // terrain (like a topo map whose lines travel); crests foam into code
-// symbols, and now and then a thought surfaces from the noise, decodes into a
-// word and sinks back. The cursor is a heavy, softly glowing weight: it drags
-// the terrain around and water flows around it.
+// symbols. The cursor is a heavy, softly glowing weight: it drags the terrain
+// around and water flows around it. Clicking the sea sends a ripple through
+// the terrain.
 // Scrolling glides through the sea with a little inertia and stirs it up.
 ---
 
@@ -47,13 +47,23 @@
   const GLOW_LAG_MS = 50; // the glow follows the pointer a little more closely
   // Glyph changes per ms: calm water, crests, and both while scrolling.
   const CHURN_RATES = [0.0005, 0.0016, 0.005];
-  const WORD_LIFE = 6200; // ms
   const TERRAIN_SCALE = 0.0019; // terrain "zoom", in noise units per pixel
-  const LEVELS = 6; // wave crests across the terrain's height range
+  const LEVELS = 5; // wave crests across the terrain's height range
   const WAVE_SPEED = 0.00022; // how fast the crests travel, contour levels per ms
   const CREST_WIDTH = 9; // px
   const WAKE_LENGTH = 42; // px of spray trailing each crest
   const WAKE_STRENGTH = 0.42;
+  // A click raises a ridge in the terrain that runs outwards as a ring, so
+  // contour lines circle out from where you clicked.
+  const RIPPLE_SPEED = 0.32; // px per ms
+  const RIPPLE_LIFE = 2000; // ms
+  const RIPPLE_RISE_MS = 200; // the ring grows in instead of popping up
+  const RIPPLE_WIDTH = 45; // px
+  const RIPPLE_HEIGHT = 1.1; // in contour levels
+  // Overlapping rings (spam clicking) level off at this height instead of
+  // stacking into a spike.
+  const RIPPLE_CEILING = 1.5;
+  const MAX_RIPPLES = 24;
   const SLOW_FRAME_MS = 9; // above this average draw time, idle frames drop to 30 fps
 
   // Bands of the swell, from trough to crest.
@@ -63,19 +73,10 @@
   const CODE = "{}<>/=;()[]$#";
   const FOAM = "~*+%";
 
-  // Thoughts that surface from the sea now and then.
-  const WORDS = [
-    "idea", "create", "code", "design", "imagine", "build", "ship it",
-    "what if?", "hello world", "curious", "story", "pixels", "motion",
-    "dream", "ferret", "content", "experiment", "make it weird",
-    "refactor", "inspiration", "flow", "signal", "create > consume",
-  ];
-
-  // Colour variants in the glyph atlas: 0 = sea, 1 = lit by the cursor, 2 = thoughts.
+  // Colour variants in the glyph atlas: 0 = sea, 1 = lit by the cursor.
   const COLORS = [
     "rgb(161 161 170)", // zinc-400
     "rgb(212 212 216)", // zinc-300
-    "rgb(244 244 245)", // zinc-100
   ];
 
   // --- Noise -------------------------------------------------------------
@@ -147,7 +148,7 @@
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const GLYPHS = Array.from(
-      new Set((DOTS + BITS + HEX + CODE + FOAM + WORDS.join("")).split("")),
+      new Set((DOTS + BITS + HEX + CODE + FOAM).split("")),
     );
     const glyphIndex = new Map(GLYPHS.map((g, i) => [g, i]));
     const ids = (s: string) => Uint8Array.from(s.split("").map((g) => glyphIndex.get(g)!));
@@ -156,7 +157,6 @@
     const HEX_IDS = ids(HEX);
     const CODE_IDS = ids(CODE);
     const FOAM_IDS = ids(FOAM);
-    const SPACE = glyphIndex.get(" ") ?? -1;
 
     let width = 0;
     let height = 0;
@@ -237,39 +237,11 @@
     const glow = { x: 0, y: 0, strength: 0 };
     let pointerActive = false;
 
-    type Thought = { glyphs: Int16Array; col: number; row: number; born: number; seed: number };
-    const thoughts: Thought[] = [];
-    let nextThought = 1200;
+    type Ripple = { x: number; y: number; born: number };
+    const ripples: Ripple[] = [];
 
     let scrollSmooth = window.scrollY * PARALLAX;
     let stir = 0;
-
-    function spawnThought(now: number) {
-      const text = WORDS[Math.floor(Math.random() * WORDS.length)];
-      const visibleCols = Math.floor(width / cellW);
-      const len = text.length;
-      let col: number;
-      if (width >= 900) {
-        // Keep to the margins on wide screens, away from the content column.
-        const margin = Math.floor(visibleCols * 0.24);
-        const span = Math.max(1, margin - len - 2);
-        const left = Math.random() < 0.5;
-        col = left ? 2 + Math.floor(Math.random() * span) : visibleCols - margin + Math.floor(Math.random() * span);
-      } else {
-        col = 1 + Math.floor(Math.random() * Math.max(1, visibleCols - len - 2));
-      }
-      const screenRow = 3 + Math.floor(Math.random() * Math.max(1, height / LINE_HEIGHT - 6));
-      const row = Math.floor(scrollSmooth / LINE_HEIGHT) + screenRow;
-      // Don't stack thoughts on top of each other.
-      if (thoughts.some((t) => Math.abs(t.row - row) < 3)) return;
-      thoughts.push({
-        glyphs: Int16Array.from(text.split("").map((g) => glyphIndex.get(g)!)),
-        col,
-        row,
-        born: now,
-        seed: Math.floor(Math.random() * 1e6),
-      });
-    }
 
     // --- Drawing -------------------------------------------------------
     function draw(t: number, still: boolean) {
@@ -303,7 +275,7 @@
           const px = (wx + ox) * TERRAIN_SCALE;
           const py = (wy + oy) * TERRAIN_SCALE;
           noiseGrid[g] =
-            (noise(px, py, nz) + 0.45 * noise(px * 2.1, py * 2.1, nz * 1.4 + 7.3)) / 1.45;
+            (noise(px, py, nz) + 0.3 * noise(px * 2.1, py * 2.1, nz * 1.4 + 7.3)) / 1.3;
           // ... and even bigger regions of calm and rough water.
           noiseGrid[g + 1] = noise(wx * 0.0011 + 31.7, wy * 0.0011, nz * 0.7 + 3.1);
         }
@@ -314,6 +286,19 @@
       // Pass 1: terrain (in contour levels, shifted over time so the lines
       // travel uphill like waves) and roughness for every cell.
       const shift = t * WAVE_SPEED;
+      // Each ripple's current ring radius and height.
+      const reach = RIPPLE_WIDTH * 3;
+      const rippleW2 = RIPPLE_WIDTH * RIPPLE_WIDTH;
+      const rings = ripples.map((rp) => {
+        const age = t - rp.born;
+        const fadeOut = 1 - age / RIPPLE_LIFE;
+        return {
+          x: rp.x,
+          y: rp.y,
+          radius: age * RIPPLE_SPEED,
+          height: RIPPLE_HEIGHT * clamp01(age / RIPPLE_RISE_MS) * fadeOut * fadeOut,
+        };
+      });
       for (let r = 0; r < rows; r++) {
         const ny = r / NOISE_STEP_Y;
         const ny0 = Math.floor(ny);
@@ -333,6 +318,12 @@
             ) *
               LEVELS -
             shift;
+          let bump = 0;
+          for (const ring of rings) {
+            const s = Math.hypot(c * cellW + cellW / 2 - ring.x, r * LINE_HEIGHT - frac - ring.y) - ring.radius;
+            if (s > -reach && s < reach) bump += ring.height * Math.exp(-(s * s) / rippleW2);
+          }
+          if (bump > 0) cellLevel[i] += RIPPLE_CEILING * Math.tanh(bump / RIPPLE_CEILING);
           cellRough[i] = lerp(
             lerp(noiseGrid[g0 + 1], noiseGrid[g0 + 3], nfx),
             lerp(noiseGrid[g1 + 1], noiseGrid[g1 + 3], nfx),
@@ -392,8 +383,8 @@
           let alpha = 0;
           if (level < 0.1) {
             // Open water: dark, with the odd speck or stray bit drifting by.
-            if (pick < 0.07) {
-              glyph = pick < 0.012 ? BIT_IDS[Math.floor(pick * 977) & 1] : DOT_IDS[pick < 0.02 ? 1 : 0];
+            if (pick < 0.04) {
+              glyph = pick < 0.008 ? BIT_IDS[Math.floor(pick * 977) & 1] : DOT_IDS[pick < 0.02 ? 1 : 0];
               alpha = 0.08;
             }
           } else if (level < 0.35) {
@@ -436,34 +427,6 @@
           const step = Math.min(ALPHA_STEPS - 1, Math.floor(alpha * ALPHA_STEPS));
           cellGlyph[i] = glyph;
           cellBucket[i] = step > 0 ? color * ALPHA_STEPS + step : -1;
-        }
-      }
-
-      // Thoughts decode out of the noise, hold, then dissolve back into it.
-      for (const th of thoughts) {
-        const age = t - th.born;
-        const r = th.row - baseRow;
-        if (r < 0 || r >= rows) continue;
-        for (let k = 0; k < th.glyphs.length; k++) {
-          const c = th.col + k;
-          if (c < 0 || c >= cols) continue;
-          const i = r * cols + c;
-          const rnd = hash(th.seed, k, 3);
-          const appear = rnd * 500;
-          const resolve = 600 + k * 85 + rnd * 300;
-          const dissolve = WORD_LIFE - 1600 + rnd * 1400;
-          if (age < appear || age > dissolve) continue;
-          if (age < resolve) {
-            // Still decoding: fast-cycling hex.
-            const g = HEX_IDS[Math.floor(hash(th.seed, k, Math.floor(age / 55)) * 16)];
-            cellGlyph[i] = g;
-            cellBucket[i] = 0 * ALPHA_STEPS + 7;
-          } else if (th.glyphs[k] === SPACE) {
-            cellBucket[i] = -1;
-          } else {
-            cellGlyph[i] = th.glyphs[k];
-            cellBucket[i] = 2 * ALPHA_STEPS + 10;
-          }
         }
       }
 
@@ -621,19 +584,14 @@
       const speed = Math.abs(scrollSmooth - prev) / dt; // px per ms
       stir = lerp(stir, Math.min(1, speed / 1.2), speed / 1.2 > stir ? 0.25 : 0.04);
       const stirring = updateWeight(dt);
-      const moving = prev !== scrollSmooth || stir > 0.02 || stirring;
+      for (let k = ripples.length - 1; k >= 0; k--) {
+        if (t - ripples[k].born > RIPPLE_LIFE) ripples.splice(k, 1);
+      }
+      const moving = prev !== scrollSmooth || stir > 0.02 || stirring || ripples.length > 0;
 
       // On slow devices, only idle frames are throttled; scrolling stays fluid.
       if (!moving && drawCost > SLOW_FRAME_MS && t - lastDraw < 1000 / 31) return;
       lastDraw = t;
-
-      for (let k = thoughts.length - 1; k >= 0; k--) {
-        if (t - thoughts[k].born > WORD_LIFE) thoughts.splice(k, 1);
-      }
-      if (t > nextThought) {
-        if (thoughts.length < (width >= 900 ? 3 : 1)) spawnThought(t);
-        nextThought = t + 1800 + Math.random() * 2600;
-      }
 
       const before = performance.now();
       draw(t, false);
@@ -659,6 +617,14 @@
       },
       { passive: true },
     );
+
+    // Only clicks on the sea itself, not on links, buttons or the cards over it.
+    window.addEventListener("click", (event) => {
+      const target = event.target as Element | null;
+      if (target?.closest("a, button, input, textarea, select, label, summary, .surface-shadow")) return;
+      if (ripples.length >= MAX_RIPPLES) return;
+      ripples.push({ x: event.clientX, y: event.clientY, born: performance.now() - start });
+    });
 
     document.documentElement.addEventListener("pointerleave", () => {
       pointerActive = false;
