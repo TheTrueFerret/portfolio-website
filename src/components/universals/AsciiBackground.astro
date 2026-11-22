@@ -1,8 +1,11 @@
 ---
-// Full-page ASCII "topographic map" that sits behind every page.
-// Contour lines are drawn with the same / \ | _ - glyphs as the hero's
-// figlet lettering, slowly morph over time, drift with scroll (parallax)
-// and light up around the cursor.
+// Full-page "sea of data" that sits behind every page.
+// Swells of bits and hex follow the contours of a big, slowly morphing noise
+// terrain (like a topo map whose lines travel); crests foam into code
+// symbols, and now and then a thought surfaces from the noise, decodes into a
+// word and sinks back. The cursor is a heavy, softly glowing weight: it drags
+// the terrain around and water flows around it.
+// Scrolling glides through the sea with a little inertia and stirs it up.
 ---
 
 <canvas
@@ -16,29 +19,66 @@
     /* Keep the centre column (where the content lives) calmer than the edges */
     mask-image: radial-gradient(
       ellipse 70% 80% at 50% 45%,
-      rgb(0 0 0 / 0.45) 0%,
+      rgb(0 0 0 / 0.5) 0%,
       rgb(0 0 0 / 1) 100%
     );
   }
 </style>
 
 <script>
+  // --- Tuning ------------------------------------------------------------
   const FONT_SIZE = 13;
   const LINE_HEIGHT = 15;
-  const NOISE_SCALE = 0.0021; // terrain "zoom", in noise units per pixel
-  const LEVELS = 7; // contour lines across the full noise range
-  const INDEX_EVERY = 5; // every Nth contour is drawn brighter, like a real topo map
-  const PARALLAX = 0.35; // terrain scrolls at this fraction of the page speed
-  const TIME_SPEED = 0.000028; // noise z-axis units per ms
-  const DRIFT_SPEED = 0.006; // px per ms of sideways drift
-  const GRID_COLS = 14;
-  const GRID_ROWS = 7;
-  const GLOW_RADIUS = 220;
-  const FRAME_MS = 1000 / 30;
+  const PARALLAX = 0.45; // the sea scrolls at this fraction of the page speed
+  const SCROLL_EASE_MS = 140; // time constant of the scroll inertia
   const ALPHA_STEPS = 16;
-  const RGB = "161 161 170"; // zinc-400
+  // The cursor is a heavy weight on the sea: it lags behind the real pointer,
+  // drags the terrain along in the direction it moves and bends the contour
+  // lines towards itself.
+  const WEIGHT_LAG_MS = 130; // how far the weight trails the pointer
+  const DRAG_RADIUS = 170; // px
+  const DRAG = 1.4; // how much of the weight's movement is passed on to the terrain
+  const FLOW = 0.8; // water pushed ahead of the cursor and flowing back past its sides
+  const DRAG_RELAX_MS = 1500; // how long the terrain takes to spring back
+  const DRAG_MAX = 260; // px
+  const WELL_RADIUS = 170; // px
+  const WELL_PULL = 0.6; // how strongly lines bend towards a resting cursor
+  const GLOW_RADIUS = 120; // px
+  const GLOW_LAG_MS = 50; // the glow follows the pointer a little more closely
+  // Glyph changes per ms: calm water, crests, and both while scrolling.
+  const CHURN_RATES = [0.0005, 0.0016, 0.005];
+  const WORD_LIFE = 6200; // ms
+  const TERRAIN_SCALE = 0.0019; // terrain "zoom", in noise units per pixel
+  const LEVELS = 6; // wave crests across the terrain's height range
+  const WAVE_SPEED = 0.00022; // how fast the crests travel, contour levels per ms
+  const CREST_WIDTH = 9; // px
+  const WAKE_LENGTH = 42; // px of spray trailing each crest
+  const WAKE_STRENGTH = 0.42;
+  const SLOW_FRAME_MS = 9; // above this average draw time, idle frames drop to 30 fps
 
-  // --- Improved Perlin noise (Ken Perlin, 2002) -------------------------
+  // Bands of the swell, from trough to crest.
+  const DOTS = ".:";
+  const BITS = "01";
+  const HEX = "0123456789abcdef";
+  const CODE = "{}<>/=;()[]$#";
+  const FOAM = "~*+%";
+
+  // Thoughts that surface from the sea now and then.
+  const WORDS = [
+    "idea", "create", "code", "design", "imagine", "build", "ship it",
+    "what if?", "hello world", "curious", "story", "pixels", "motion",
+    "dream", "ferret", "content", "experiment", "make it weird",
+    "refactor", "inspiration", "flow", "signal", "create > consume",
+  ];
+
+  // Colour variants in the glyph atlas: 0 = sea, 1 = lit by the cursor, 2 = thoughts.
+  const COLORS = [
+    "rgb(161 161 170)", // zinc-400
+    "rgb(212 212 216)", // zinc-300
+    "rgb(244 244 245)", // zinc-100
+  ];
+
+  // --- Noise -------------------------------------------------------------
   const perm = new Uint8Array(512);
   {
     const p = Array.from({ length: 256 }, (_, i) => i);
@@ -51,6 +91,7 @@
 
   const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
   const lerp = (a: number, b: number, t: number) => a + t * (b - a);
+  const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
   function grad(hash: number, x: number, y: number, z: number) {
     const h = hash & 15;
@@ -90,168 +131,517 @@
     );
   }
 
-  const terrain = (x: number, y: number, z: number) =>
-    (noise(x, y, z) + 0.45 * noise(x * 2.1, y * 2.1, z * 1.4 + 7.3)) / 1.45;
+  // Cheap integer hash -> [0, 1), stable per (a, b, c).
+  function hash(a: number, b: number, c: number) {
+    let h = Math.imul(a, 374761393) ^ Math.imul(b, 668265263) ^ Math.imul(c, 2147483647);
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  }
 
-  // --- Rendering ---------------------------------------------------------
+  // --- Setup -------------------------------------------------------------
   const canvas = document.getElementById("ascii-background") as HTMLCanvasElement | null;
   const ctx = canvas?.getContext("2d");
 
   if (canvas && ctx) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+    const GLYPHS = Array.from(
+      new Set((DOTS + BITS + HEX + CODE + FOAM + WORDS.join("")).split("")),
+    );
+    const glyphIndex = new Map(GLYPHS.map((g, i) => [g, i]));
+    const ids = (s: string) => Uint8Array.from(s.split("").map((g) => glyphIndex.get(g)!));
+    const DOT_IDS = ids(DOTS);
+    const BIT_IDS = ids(BITS);
+    const HEX_IDS = ids(HEX);
+    const CODE_IDS = ids(CODE);
+    const FOAM_IDS = ids(FOAM);
+    const SPACE = glyphIndex.get(" ") ?? -1;
+
     let width = 0;
     let height = 0;
-    let cellW = 0;
+    let dpr = 1;
+    let cellW = 8;
     let cols = 0;
     let rows = 0;
-    let values = new Float32Array(0);
+    let atlas: HTMLCanvasElement | null = null;
+    let tileW = 0;
+    let tileH = 0;
 
-    const pointer = { x: -9999, y: -9999 };
-    const glow = { x: -9999, y: -9999, strength: 0 };
-    let pointerActive = false;
+    // Per-cell scratch buffers, rebuilt on resize.
+    let cellGlyph = new Int16Array(0);
+    let cellBucket = new Int16Array(0);
+    let cellY = new Float32Array(0);
+    let cellLevel = new Float32Array(0);
+    let cellRough = new Float32Array(0);
+    let order = new Int32Array(0);
+    const BUCKETS = COLORS.length * ALPHA_STEPS;
+    const bucketStart = new Int32Array(BUCKETS + 1);
+    const bucketFill = new Int32Array(BUCKETS);
 
-    // One bucket of glyph positions per alpha step, so each frame only
-    // switches fillStyle ALPHA_STEPS times instead of once per glyph.
-    const buckets: { chars: string[]; xs: number[]; ys: number[] }[] = Array.from(
-      { length: ALPHA_STEPS },
-      () => ({ chars: [], xs: [], ys: [] }),
-    );
+    // Coarse noise grid, interpolated per cell (noise is the expensive bit).
+    const NOISE_STEP_X = 4;
+    const NOISE_STEP_Y = 2;
+    let noiseCols = 0;
+    let noiseRows = 0;
+    let noiseGrid = new Float32Array(0);
+    // Screen-space displacement of the terrain, on the same lattice.
+    let dragX = new Float32Array(0);
+    let dragY = new Float32Array(0);
+    let dragTmp = new Float32Array(0);
+
+    function buildAtlas() {
+      tileW = Math.ceil(cellW * dpr) + 2;
+      tileH = Math.ceil(LINE_HEIGHT * dpr);
+      atlas = document.createElement("canvas");
+      atlas.width = tileW * GLYPHS.length;
+      atlas.height = tileH * COLORS.length;
+      const a = atlas.getContext("2d")!;
+      a.font = `${FONT_SIZE * dpr}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+      a.textBaseline = "top";
+      COLORS.forEach((color, ci) => {
+        a.fillStyle = color;
+        GLYPHS.forEach((g, gi) => a.fillText(g, gi * tileW + 1, ci * tileH + dpr));
+      });
+    }
 
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       width = window.innerWidth;
       height = window.innerHeight;
       canvas!.width = Math.round(width * dpr);
       canvas!.height = Math.round(height * dpr);
-      ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx!.font = `${FONT_SIZE}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
-      ctx!.textBaseline = "top";
       cellW = ctx!.measureText("M").width;
-      cols = Math.ceil(width / cellW) + 2;
+      cols = Math.ceil(width / cellW) + 1;
       rows = Math.ceil(height / LINE_HEIGHT) + 2;
-      values = new Float32Array(cols * rows);
+      const n = cols * rows;
+      cellGlyph = new Int16Array(n);
+      cellBucket = new Int16Array(n);
+      cellY = new Float32Array(rows);
+      cellLevel = new Float32Array(n);
+      cellRough = new Float32Array(n);
+      order = new Int32Array(n);
+      noiseCols = Math.ceil(cols / NOISE_STEP_X) + 2;
+      noiseRows = Math.ceil(rows / NOISE_STEP_Y) + 2;
+      noiseGrid = new Float32Array(noiseCols * noiseRows * 2);
+      dragX = new Float32Array(noiseCols * noiseRows);
+      dragY = new Float32Array(noiseCols * noiseRows);
+      dragTmp = new Float32Array(noiseCols * noiseRows);
+      buildAtlas();
     }
 
-    function draw(elapsed: number) {
-      const scrollOffset = reducedMotion.matches ? 0 : window.scrollY * PARALLAX;
-      const z = elapsed * TIME_SPEED;
-      const drift = elapsed * DRIFT_SPEED;
+    // --- Interaction state ---------------------------------------------
+    const pointer = { x: -9999, y: -9999 };
+    const weight = { x: 0, y: 0, strength: 0, placed: false };
+    const glow = { x: 0, y: 0, strength: 0 };
+    let pointerActive = false;
 
-      // Sample the terrain one cell outside the viewport on every side so
-      // the finite-difference gradient below is defined for every visible cell.
-      for (let r = 0; r < rows; r++) {
-        const py = ((r - 1) * LINE_HEIGHT + scrollOffset) * NOISE_SCALE;
-        for (let c = 0; c < cols; c++) {
-          const px = ((c - 1) * cellW + drift) * NOISE_SCALE;
-          values[r * cols + c] = terrain(px, py, z) * LEVELS;
+    type Thought = { glyphs: Int16Array; col: number; row: number; born: number; seed: number };
+    const thoughts: Thought[] = [];
+    let nextThought = 1200;
+
+    let scrollSmooth = window.scrollY * PARALLAX;
+    let stir = 0;
+
+    function spawnThought(now: number) {
+      const text = WORDS[Math.floor(Math.random() * WORDS.length)];
+      const visibleCols = Math.floor(width / cellW);
+      const len = text.length;
+      let col: number;
+      if (width >= 900) {
+        // Keep to the margins on wide screens, away from the content column.
+        const margin = Math.floor(visibleCols * 0.24);
+        const span = Math.max(1, margin - len - 2);
+        const left = Math.random() < 0.5;
+        col = left ? 2 + Math.floor(Math.random() * span) : visibleCols - margin + Math.floor(Math.random() * span);
+      } else {
+        col = 1 + Math.floor(Math.random() * Math.max(1, visibleCols - len - 2));
+      }
+      const screenRow = 3 + Math.floor(Math.random() * Math.max(1, height / LINE_HEIGHT - 6));
+      const row = Math.floor(scrollSmooth / LINE_HEIGHT) + screenRow;
+      // Don't stack thoughts on top of each other.
+      if (thoughts.some((t) => Math.abs(t.row - row) < 3)) return;
+      thoughts.push({
+        glyphs: Int16Array.from(text.split("").map((g) => glyphIndex.get(g)!)),
+        col,
+        row,
+        born: now,
+        seed: Math.floor(Math.random() * 1e6),
+      });
+    }
+
+    // --- Drawing -------------------------------------------------------
+    function draw(t: number, still: boolean) {
+      const offset = still ? 0 : scrollSmooth;
+      const baseRow = Math.floor(offset / LINE_HEIGHT);
+      const frac = offset - baseRow * LINE_HEIGHT;
+
+      // Coarse noise lattice, in world space so it scrolls with the sea.
+      const nz = t * 0.00004;
+      const wellOn = !still && weight.strength > 0.01;
+      const wellR2 = WELL_RADIUS * WELL_RADIUS;
+      for (let gy = 0; gy < noiseRows; gy++) {
+        const wy = (baseRow + gy * NOISE_STEP_Y) * LINE_HEIGHT;
+        const sy = gy * NOISE_STEP_Y * LINE_HEIGHT - frac;
+        for (let gx = 0; gx < noiseCols; gx++) {
+          const wx = gx * NOISE_STEP_X * cellW;
+          const k = gy * noiseCols + gx;
+          const g = k * 2;
+          // The cursor's weight: sample the terrain from where it was dragged
+          // from, and from further out near the cursor so lines bend inwards.
+          let ox = -dragX[k];
+          let oy = -dragY[k];
+          if (wellOn) {
+            const dx = wx - weight.x;
+            const dy = sy - weight.y;
+            const pull = WELL_PULL * weight.strength * Math.exp(-(dx * dx + dy * dy) / wellR2);
+            ox += dx * pull;
+            oy += dy * pull;
+          }
+          // Big, slowly morphing terrain (like the old topo map) ...
+          const px = (wx + ox) * TERRAIN_SCALE;
+          const py = (wy + oy) * TERRAIN_SCALE;
+          noiseGrid[g] =
+            (noise(px, py, nz) + 0.45 * noise(px * 2.1, py * 2.1, nz * 1.4 + 7.3)) / 1.45;
+          // ... and even bigger regions of calm and rough water.
+          noiseGrid[g + 1] = noise(wx * 0.0011 + 31.7, wy * 0.0011, nz * 0.7 + 3.1);
         }
       }
 
-      for (const b of buckets) {
-        b.chars.length = 0;
-        b.xs.length = 0;
-        b.ys.length = 0;
+      const swellBoost = stir * 0.14;
+
+      // Pass 1: terrain (in contour levels, shifted over time so the lines
+      // travel uphill like waves) and roughness for every cell.
+      const shift = t * WAVE_SPEED;
+      for (let r = 0; r < rows; r++) {
+        const ny = r / NOISE_STEP_Y;
+        const ny0 = Math.floor(ny);
+        const nfy = ny - ny0;
+        for (let c = 0; c < cols; c++) {
+          const nx = c / NOISE_STEP_X;
+          const nx0 = Math.floor(nx);
+          const nfx = nx - nx0;
+          const g0 = (ny0 * noiseCols + nx0) * 2;
+          const g1 = g0 + noiseCols * 2;
+          const i = r * cols + c;
+          cellLevel[i] =
+            lerp(
+              lerp(noiseGrid[g0], noiseGrid[g0 + 2], nfx),
+              lerp(noiseGrid[g1], noiseGrid[g1 + 2], nfx),
+              nfy,
+            ) *
+              LEVELS -
+            shift;
+          cellRough[i] = lerp(
+            lerp(noiseGrid[g0 + 1], noiseGrid[g0 + 3], nfx),
+            lerp(noiseGrid[g1 + 1], noiseGrid[g1 + 3], nfx),
+            nfy,
+          );
+        }
       }
 
-      const gridRowShift = Math.floor(scrollOffset / LINE_HEIGHT);
+      // Pass 2: each contour is a crest of data with a wake of spray behind it.
+      const crestW2 = CREST_WIDTH * CREST_WIDTH;
+      const glowOn = !still && glow.strength > 0.01;
       const glowR2 = GLOW_RADIUS * GLOW_RADIUS;
+      const stirTier = stir > 0.3 ? 1 : 0;
+      for (let r = 0; r < rows; r++) {
+        const y = Math.round((r * LINE_HEIGHT - frac) * dpr) / dpr;
+        cellY[r] = y;
+        const worldRow = baseRow + r;
+        const rUp = r > 0 ? -cols : 0;
+        const rDown = r < rows - 1 ? cols : 0;
+        const dyCells = (rDown - rUp) / cols;
 
-      for (let r = 1; r < rows - 1; r++) {
-        const y = (r - 1) * LINE_HEIGHT;
-        for (let c = 1; c < cols - 1; c++) {
-          const x = (c - 1) * cellW;
+        for (let c = 0; c < cols; c++) {
           const i = r * cols + c;
-          const v = values[i];
+
+          // Gradient in levels per pixel, so line thickness is the same in
+          // pixels on steep and flat terrain (just like the old topo map).
+          const cL = c > 0 ? i - 1 : i;
+          const cR = c < cols - 1 ? i + 1 : i;
+          const gx = (cellLevel[cR] - cellLevel[cL]) / ((cR - cL) * cellW);
+          const gy = (cellLevel[i + rDown] - cellLevel[i + rUp]) / (dyCells * LINE_HEIGHT);
+          const g = Math.hypot(gx, gy) || 1e-9;
+          const v = cellLevel[i];
+          const d = (v - Math.round(v)) / g; // signed px distance to the nearest crest
+
+          const crest = Math.exp(-(d * d) / crestW2);
+          let wave = crest;
+          if (d < 0) wave += WAKE_STRENGTH * Math.exp(d / WAKE_LENGTH);
+          const amp = 0.2 + 0.8 * clamp01((cellRough[i] + 0.3) * 1.5);
 
           let light = 0;
-          if (glow.strength > 0.01) {
-            const dx = x + cellW / 2 - glow.x;
+          if (glowOn) {
+            const dx = c * cellW + cellW / 2 - glow.x;
             const dy = y + LINE_HEIGHT / 2 - glow.y;
             light = Math.exp(-(dx * dx + dy * dy) / glowR2) * glow.strength;
           }
+          const level = amp * wave + swellBoost;
 
-          // Gradient in level units per pixel.
-          const gx = (values[i + 1] - values[i - 1]) / (2 * cellW);
-          const gy = (values[i + cols] - values[i - cols]) / (2 * LINE_HEIGHT);
-          const ax = Math.abs(gx);
-          const ay = Math.abs(gy);
-          const g = Math.hypot(gx, gy);
+          // Glyph churn: crests and a stirred sea flicker faster. Rates come in
+          // fixed tiers so a cell's glyph changes at a steady pace instead of
+          // jumping whenever its level shifts.
+          const tier = (level > 0.75 ? 1 : 0) + stirTier;
+          const seed = hash(c, worldRow, 7);
+          const tick = Math.floor(t * CHURN_RATES[tier] + seed * 97) + tier * 7919;
+          const pick = hash(c, worldRow, tick);
 
-          const level = Math.round(v);
-          const pixelDist = Math.abs(level - v) / (g || 1e-9);
-          // Allow roughly half a cell of thickness, measured across the line.
-          const threshold = (0.45 * (ax * cellW + ay * LINE_HEIGHT)) / (ax + ay || 1);
-
-          let char = "";
+          let glyph = -1;
           let alpha = 0;
-
-          if (pixelDist < threshold) {
-            if (ay > ax * 2.2) {
-              // Horizontal contour; sit "_" low when the line passes below centre.
-              const offsetY = (((level - v) / g) * gy) / g;
-              char = offsetY > LINE_HEIGHT * 0.12 ? "_" : "-";
-            } else if (ax > ay * 2.2) {
-              char = "|";
-            } else {
-              char = gx * gy > 0 ? "/" : "\\";
+          if (level < 0.1) {
+            // Open water: dark, with the odd speck or stray bit drifting by.
+            if (pick < 0.07) {
+              glyph = pick < 0.012 ? BIT_IDS[Math.floor(pick * 977) & 1] : DOT_IDS[pick < 0.02 ? 1 : 0];
+              alpha = 0.08;
             }
-            const isIndex = ((level % INDEX_EVERY) + INDEX_EVERY) % INDEX_EVERY === 0;
-            alpha = (isIndex ? 0.3 : 0.15) + light * 0.85;
-          } else if (
-            c % GRID_COLS === 0 &&
-            (((r + gridRowShift) % GRID_ROWS) + GRID_ROWS) % GRID_ROWS === 0
-          ) {
-            char = "+";
-            alpha = 0.1 + light * 0.3;
-          } else if (light > 0.12 && (c + r) % 2 === 0) {
-            char = v - Math.floor(v) > 0.5 ? ":" : ".";
-            alpha = light * 0.3;
+          } else if (level < 0.35) {
+            // Swell building: a thin spray of bits.
+            if (pick < 0.25 + level * 1.6) {
+              glyph = pick < 0.22 ? DOT_IDS[pick < 0.07 ? 1 : 0] : BIT_IDS[Math.floor(pick * 64) & 1];
+              alpha = 0.07 + level * 0.4;
+            }
+          } else if (level < 0.75) {
+            // The body of the wave: packets of hex and code.
+            glyph =
+              pick < 0.4
+                ? BIT_IDS[Math.floor(pick * 64) & 1]
+                : pick < 0.86
+                  ? HEX_IDS[Math.floor(pick * 1024) & 15]
+                  : CODE_IDS[Math.floor(pick * 977) % CODE_IDS.length];
+            alpha = 0.08 + level * 0.36;
+          } else {
+            // Crest: foam.
+            glyph =
+              pick < 0.5
+                ? FOAM_IDS[Math.floor(pick * 512) % FOAM_IDS.length]
+                : pick < 0.75
+                  ? CODE_IDS[Math.floor(pick * 977) % CODE_IDS.length]
+                  : HEX_IDS[Math.floor(pick * 1024) & 15];
+            alpha = 0.12 + Math.min(level, 1.4) * 0.34;
           }
 
-          if (!char) continue;
+          if (glyph < 0) {
+            cellBucket[i] = -1;
+            continue;
+          }
+
+          // The glow only lights up the core of the contour lines: it never adds
+          // glyphs, and the wake of spray behind each line and the specks in
+          // open water stay dark.
+          const lit = crest > 0.5 ? light * clamp01((crest - 0.5) * 2) * (0.4 + 0.6 * amp) : 0;
+          alpha += lit * 0.4;
+          const color = lit > 0.3 ? 1 : 0;
           const step = Math.min(ALPHA_STEPS - 1, Math.floor(alpha * ALPHA_STEPS));
-          if (step <= 0) continue;
-          const bucket = buckets[step];
-          bucket.chars.push(char);
-          bucket.xs.push(x);
-          bucket.ys.push(y);
+          cellGlyph[i] = glyph;
+          cellBucket[i] = step > 0 ? color * ALPHA_STEPS + step : -1;
         }
       }
 
-      ctx!.clearRect(0, 0, width, height);
-      for (let s = 1; s < ALPHA_STEPS; s++) {
-        const b = buckets[s];
-        if (!b.chars.length) continue;
-        ctx!.fillStyle = `rgb(${RGB} / ${(s / ALPHA_STEPS).toFixed(3)})`;
-        for (let k = 0; k < b.chars.length; k++) ctx!.fillText(b.chars[k], b.xs[k], b.ys[k]);
+      // Thoughts decode out of the noise, hold, then dissolve back into it.
+      for (const th of thoughts) {
+        const age = t - th.born;
+        const r = th.row - baseRow;
+        if (r < 0 || r >= rows) continue;
+        for (let k = 0; k < th.glyphs.length; k++) {
+          const c = th.col + k;
+          if (c < 0 || c >= cols) continue;
+          const i = r * cols + c;
+          const rnd = hash(th.seed, k, 3);
+          const appear = rnd * 500;
+          const resolve = 600 + k * 85 + rnd * 300;
+          const dissolve = WORD_LIFE - 1600 + rnd * 1400;
+          if (age < appear || age > dissolve) continue;
+          if (age < resolve) {
+            // Still decoding: fast-cycling hex.
+            const g = HEX_IDS[Math.floor(hash(th.seed, k, Math.floor(age / 55)) * 16)];
+            cellGlyph[i] = g;
+            cellBucket[i] = 0 * ALPHA_STEPS + 7;
+          } else if (th.glyphs[k] === SPACE) {
+            cellBucket[i] = -1;
+          } else {
+            cellGlyph[i] = th.glyphs[k];
+            cellBucket[i] = 2 * ALPHA_STEPS + 10;
+          }
+        }
       }
+
+      // Counting sort by bucket so each colour/alpha pair is set once per frame.
+      bucketStart.fill(0);
+      const n = cols * rows;
+      for (let i = 0; i < n; i++) {
+        const b = cellBucket[i];
+        if (b >= 0) bucketStart[b + 1]++;
+      }
+      for (let b = 0; b < BUCKETS; b++) bucketStart[b + 1] += bucketStart[b];
+      bucketFill.set(bucketStart.subarray(0, BUCKETS));
+      for (let i = 0; i < n; i++) {
+        const b = cellBucket[i];
+        if (b >= 0) order[bucketFill[b]++] = i;
+      }
+
+      ctx!.setTransform(1, 0, 0, 1, 0, 0);
+      ctx!.globalAlpha = 1;
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      const sw = tileW;
+      const sh = tileH;
+      for (let b = 0; b < BUCKETS; b++) {
+        const from = bucketStart[b];
+        const to = bucketStart[b + 1];
+        if (from === to) continue;
+        const color = Math.floor(b / ALPHA_STEPS);
+        ctx!.globalAlpha = (b % ALPHA_STEPS) / ALPHA_STEPS;
+        const sy = color * sh;
+        for (let k = from; k < to; k++) {
+          const i = order[k];
+          const r = (i / cols) | 0;
+          const c = i - r * cols;
+          ctx!.drawImage(
+            atlas!,
+            cellGlyph[i] * sw,
+            sy,
+            sw,
+            sh,
+            Math.round(c * cellW * dpr) - 1,
+            Math.round(cellY[r] * dpr),
+            sw,
+            sh,
+          );
+        }
+      }
+      ctx!.globalAlpha = 1;
     }
 
+    // --- Loop ----------------------------------------------------------
     const start = performance.now();
-    let lastFrame = -Infinity;
+    let lastTime = 0;
+    let lastDraw = -Infinity;
+    let drawCost = 0;
 
-    function updateGlow(snap: boolean) {
-      const target = pointerActive ? 1 : 0;
-      const t = snap ? 1 : 0.12;
-      glow.x = glow.x < -999 || snap ? pointer.x : lerp(glow.x, pointer.x, t);
-      glow.y = glow.y < -999 || snap ? pointer.y : lerp(glow.y, pointer.y, t);
-      glow.strength = lerp(glow.strength, target, snap ? 1 : 0.08);
+    // Moves the heavy weight after the pointer and pushes the terrain with it.
+    // Returns whether anything is still in motion.
+    function updateWeight(dt: number) {
+      if (pointerActive && !weight.placed) {
+        weight.x = pointer.x;
+        weight.y = pointer.y;
+        weight.placed = true;
+      }
+      const ease = 1 - Math.exp(-dt / WEIGHT_LAG_MS);
+      const nx = weight.x + (pointer.x - weight.x) * ease;
+      const ny = weight.y + (pointer.y - weight.y) * ease;
+      const mx = pointerActive ? nx - weight.x : 0;
+      const my = pointerActive ? ny - weight.y : 0;
+      weight.x = nx;
+      weight.y = ny;
+      weight.strength = lerp(weight.strength, pointerActive ? 1 : 0, 1 - Math.exp(-dt / 300));
+
+      const glowEase = 1 - Math.exp(-dt / GLOW_LAG_MS);
+      glow.x += (pointer.x - glow.x) * glowEase;
+      glow.y += (pointer.y - glow.y) * glowEase;
+      if (pointerActive && glow.strength < 0.01) {
+        glow.x = pointer.x;
+        glow.y = pointer.y;
+      }
+      glow.strength = lerp(glow.strength, pointerActive ? 1 : 0, 1 - Math.exp(-dt / 250));
+
+      const n = dragX.length;
+      const relax = Math.exp(-dt / DRAG_RELAX_MS);
+      const pushing = Math.abs(mx) + Math.abs(my) > 0.01;
+      const r2 = DRAG_RADIUS * DRAG_RADIUS;
+      let energy = 0;
+
+      for (let k = 0; k < n; k++) {
+        let ddx = dragX[k] * relax;
+        let ddy = dragY[k] * relax;
+        if (pushing) {
+          const gy = (k / noiseCols) | 0;
+          const dx = (k - gy * noiseCols) * NOISE_STEP_X * cellW - weight.x;
+          const dy = gy * NOISE_STEP_Y * LINE_HEIGHT - weight.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < r2 * 6) {
+            const w = Math.exp(-d2 / r2);
+            // Dragged along with the weight ...
+            ddx += mx * w * DRAG;
+            ddy += my * w * DRAG;
+            // ... plus flow around it, like water around a moving object:
+            // pushed ahead in front and behind, flowing back along the sides,
+            // so the lines curl around its path.
+            const dist = Math.sqrt(d2) || 1;
+            const ux = dx / dist;
+            const uy = dy / dist;
+            const along = mx * ux + my * uy;
+            ddx += (2 * along * ux - mx) * w * FLOW;
+            ddy += (2 * along * uy - my) * w * FLOW;
+          }
+        }
+        const len = Math.hypot(ddx, ddy);
+        if (len > DRAG_MAX) {
+          ddx *= DRAG_MAX / len;
+          ddy *= DRAG_MAX / len;
+        }
+        dragX[k] = ddx;
+        dragY[k] = ddy;
+        energy += len;
+      }
+
+      // Let the push spread out a little, like water.
+      if (energy > 0.5) {
+        for (const field of [dragX, dragY]) {
+          dragTmp.set(field);
+          for (let gy = 1; gy < noiseRows - 1; gy++) {
+            for (let gx = 1; gx < noiseCols - 1; gx++) {
+              const k = gy * noiseCols + gx;
+              const avg = (dragTmp[k - 1] + dragTmp[k + 1] + dragTmp[k - noiseCols] + dragTmp[k + noiseCols]) * 0.25;
+              field[k] = lerp(dragTmp[k], avg, 0.07);
+            }
+          }
+        }
+      }
+
+      return (
+        pushing ||
+        energy > 0.5 ||
+        (weight.strength > 0.01 && weight.strength < 0.99) ||
+        Math.abs(pointer.x - glow.x) + Math.abs(pointer.y - glow.y) > 0.5
+      );
     }
 
     function loop(now: number) {
       requestAnimationFrame(loop);
-      if (now - lastFrame < FRAME_MS) return;
-      lastFrame = now;
-      updateGlow(false);
-      draw(now - start);
+      const t = now - start;
+      const dt = Math.min(64, t - lastTime || 16);
+      lastTime = t;
+
+      // Eased scroll: the sea glides after the page and gets stirred by speed.
+      const target = window.scrollY * PARALLAX;
+      const prev = scrollSmooth;
+      scrollSmooth += (target - scrollSmooth) * (1 - Math.exp(-dt / SCROLL_EASE_MS));
+      if (Math.abs(target - scrollSmooth) < 0.05) scrollSmooth = target;
+      const speed = Math.abs(scrollSmooth - prev) / dt; // px per ms
+      stir = lerp(stir, Math.min(1, speed / 1.2), speed / 1.2 > stir ? 0.25 : 0.04);
+      const stirring = updateWeight(dt);
+      const moving = prev !== scrollSmooth || stir > 0.02 || stirring;
+
+      // On slow devices, only idle frames are throttled; scrolling stays fluid.
+      if (!moving && drawCost > SLOW_FRAME_MS && t - lastDraw < 1000 / 31) return;
+      lastDraw = t;
+
+      for (let k = thoughts.length - 1; k >= 0; k--) {
+        if (t - thoughts[k].born > WORD_LIFE) thoughts.splice(k, 1);
+      }
+      if (t > nextThought) {
+        if (thoughts.length < (width >= 900 ? 3 : 1)) spawnThought(t);
+        nextThought = t + 1800 + Math.random() * 2600;
+      }
+
+      const before = performance.now();
+      draw(t, false);
+      drawCost = lerp(drawCost, performance.now() - before, 0.1);
     }
 
-    // With reduced motion the terrain is frozen; only redraw on input.
-    const renderStill = () => {
-      updateGlow(true);
-      draw(0);
-    };
+    // With reduced motion the sea is frozen and the cursor leaves it alone.
+    const renderStill = () => draw(0, true);
 
     resize();
 
@@ -266,14 +656,12 @@
         pointer.x = event.clientX;
         pointer.y = event.clientY;
         pointerActive = event.pointerType === "mouse";
-        if (reducedMotion.matches) renderStill();
       },
       { passive: true },
     );
 
     document.documentElement.addEventListener("pointerleave", () => {
       pointerActive = false;
-      if (reducedMotion.matches) renderStill();
     });
 
     if (reducedMotion.matches) {

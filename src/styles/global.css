@@ -3,6 +3,17 @@
 @plugin "@iconify/tailwind4";
 @plugin "@tailwindcss/typography";
 
+/* Lifts a box off the sea-of-data background: a soft dark halo that clears
+   the glyphs around its edges, plus a drop shadow underneath. In the
+   components layer so Tailwind utilities can still override it. */
+@layer components {
+  .surface-shadow {
+    box-shadow:
+      0 0 28px 2px rgb(0 0 0 / 0.55),
+      0 24px 48px -18px rgb(0 0 0 / 0.9);
+  }
+}
+
 /* ---------- Terminal-style animations ----------
    Everything loads instantly; only small interactions animate. */
 
