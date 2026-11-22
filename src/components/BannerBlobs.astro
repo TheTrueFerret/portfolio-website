@@ -51,7 +51,6 @@ type Side = "top" | "bottom" | "left" | "right";
 const blobs = ([["top", "left"], ["bottom", "right"]] as const).flatMap(([y, x], i) => {
   const formatA: Format = rng() < 0.5 ? "16/9" : "9/16";
   const formatB: Format = formatA === "16/9" ? "9/16" : "16/9";
-  rng(); // the second format draw, kept so sizes and offsets stay the same
   const first = i === 0 ? 0 : 1;
   const a = sized(formatA);
   const b = sized(formatB);
