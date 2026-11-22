@@ -1,8 +1,9 @@
 ---
 // Blurred brand-colour rectangles behind a company card's logo, in the style
 // of Ferret Media's site: two staggered pairs, one in the top-left corner and
-// one in the bottom-right, each block 16:9, 9:16 or square. The layout comes
-// from `seed`, so a card looks the same on every visit.
+// one in the bottom-right. Each pair is one 16:9 and one 9:16 block, like
+// landscape and vertical video. The layout comes from `seed`, so a card looks
+// the same on every visit.
 //
 // The parent needs `relative isolate overflow-hidden`.
 
@@ -13,8 +14,6 @@ interface Props {
 }
 
 const { seed, colors } = Astro.props;
-
-const FORMATS = [16 / 9, 9 / 16, 1];
 
 /** mulberry32, seeded from the string with FNV-1a. */
 function random(text: string) {
@@ -31,23 +30,28 @@ function random(text: string) {
 const rng = random(seed);
 const between = (min: number, max: number) => min + rng() * (max - min);
 
-/** Sizes that give the three formats about the same weight in a 176px
- * banner, small enough that a corner pair stays clear of the logo. */
-function sized(format: number) {
-  const ratio = FORMATS[format];
-  if (ratio > 1) return { w: between(100, 120), ratio };
-  if (ratio < 1) return { w: between(120, 140) * ratio, ratio };
-  return { w: between(72, 88), ratio };
+type Format = "16/9" | "9/16";
+
+/** Sizes that give both formats about the same weight in a 176px banner,
+ * small enough that a corner pair stays clear of the logo. */
+function sized(format: Format) {
+  if (format === "16/9") {
+    const w = between(100, 120);
+    return { w, h: (w * 9) / 16, format };
+  }
+  const h = between(120, 140);
+  return { w: (h * 9) / 16, h, format };
 }
 
-/* Each corner gets a pair of two different formats, the second stepped
+/* Each corner gets a 16:9 and a 9:16 block, the second stepped
  * mostly along the edge (the banner is wide and short) and a little in, so
  * they overlap at a corner. */
 type Side = "top" | "bottom" | "left" | "right";
 
 const blobs = ([["top", "left"], ["bottom", "right"]] as const).flatMap(([y, x], i) => {
-  const formatA = Math.floor(rng() * 3);
-  const formatB = (formatA + 1 + Math.floor(rng() * 2)) % 3;
+  const formatA: Format = rng() < 0.5 ? "16/9" : "9/16";
+  const formatB: Format = formatA === "16/9" ? "9/16" : "16/9";
+  rng(); // the second format draw, kept so sizes and offsets stay the same
   const first = i === 0 ? 0 : 1;
   const a = sized(formatA);
   const b = sized(formatB);
@@ -59,16 +63,16 @@ const blobs = ([["top", "left"], ["bottom", "right"]] as const).flatMap(([y, x],
       ...b,
       color: colors[1 - first],
       float: i * 2 + 1,
-      pos: { [y]: edge + a.w / a.ratio / 2, [x]: edge + step },
+      pos: { [y]: edge + a.h / 2, [x]: edge + step },
     },
-  ] as { w: number; ratio: number; color: string; float: number; pos: Partial<Record<Side, number>> }[];
+  ] as { w: number; format: Format; color: string; float: number; pos: Partial<Record<Side, number>> }[];
 });
 
 const style = (blob: (typeof blobs)[number]) =>
   [
     ...Object.entries(blob.pos).map(([side, px]) => `${side}:${Math.round(px)}px`),
     `width:${Math.round(blob.w)}px`,
-    `aspect-ratio:${blob.ratio}`,
+    `aspect-ratio:${blob.format}`,
     `background:${blob.color}`,
   ].join(";");
 ---
