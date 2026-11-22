@@ -95,18 +95,20 @@ const companies = [
                       {company.id === "linker" && (
                         <div class="flex items-center gap-3">
                           <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
+                            viewBox="170 170 460 460"
                             aria-hidden="true"
                             class="w-12 h-12"
                           >
-                            <path
-                              d="m15.6 7-6.4 6.5a1.5 1.5 0 0 0 2.1 2.1l6.4-6.5a3 3 0 1 0-4.2-4.3l-6.4 6.5a4.5 4.5 0 1 0 6.4 6.4l6.3-6.4"
-                              stroke="#fafafa"
-                              stroke-width="1.9"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
+                            {[
+                              { fill: "#4545e6", offset: 14 },
+                              { fill: "#a01d90", offset: -14 },
+                              { fill: "#fafafa", offset: 0 },
+                            ].map(({ fill, offset }) => (
+                              <g fill={fill} transform={`translate(${offset} ${offset})`}>
+                                <rect x="198" y="192" width="154" height="275" rx="19" />
+                                <rect x="353" y="468" width="249" height="140" rx="19" />
+                              </g>
+                            ))}
                           </svg>
                           <span class="text-4xl font-bold text-white">
                             Linker
